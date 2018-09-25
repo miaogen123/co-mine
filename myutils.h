@@ -13,11 +13,12 @@ class SocketManager{
 private:
 	std::string ipAddr, port;
 	struct sockaddr_in address;
-	int listenfd;
+	int socketfd;
 	// true 表示connect使用, false 表示
 	bool used;
+
+	int createSocket();
 public:	
-	SocketManager()=delete;
 	//自动使用connect
 	SocketManager(std::string ipAddr="127.0.0.1", std::string port="53286");
 	void setIpAddrPort(std::string ipaddr, std::string port="53286");

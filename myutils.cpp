@@ -14,13 +14,18 @@
 #include<string.h>
 #include"myutils.h"
 #include<arpa/inet.h>
+#include<sys/types.h>
+#include<sys/socket.h>
 
 
+//TODO::应该给用户获取socket的选项的public 接口
 int SocketManager::getSocketOpt(int level, int optname, void *optval, socklen_t *optlen) const{
 	return true;
 
 }
+//TODO::应该给用户设置socket的public 接口
 int SocketManager::setSokcetOpt(int level, int optname, void *optval, socklen_t *optlen){
+	//setsockopt(socketfd, SOL_SOCKET, )
 	return true;
 
 }
@@ -30,51 +35,63 @@ void inline SocketManager::setIpAddrPort(std::string ipaddr, std::string port_ar
 	ipAddr=ipaddr, port=port_argu;
 }
 
-bool SocketManager::connect(std::string ipAddr, std::string port){
-	if(used==false){
+bool SocketManager::connect(std::string ipaddr, std::string port_argu){
+	ipAddr=ipaddr, port=port_argu;
+	if(createSocket()==-1){
+		std::cout<<" this socket has been  used as listen socket "<<std::endl;
 		return -1;
 	}
-
-	return true;
+	::connect(socketfd,(struct sockaddr*)&address, sizeof(address));
+	return socketfd;
 }
 
 int SocketManager::bindAndListenSocket(std::string ipaddr, std::string port_argu){
-	if(used==true){
+	ipAddr=ipaddr, port=port_argu;
+	if(createSocket()==-1){
+		std::cout<<" this socket has been  used as connect socket "<<std::endl;
 		return -1;
 	}
-	ipAddr=ipaddr, port=port_argu;
-	bzero(&address, sizeof(address));
-	address.sin_family=AF_INET;
-	inet_pton(AF_INET, ipAddr.c_str() , &address.sin_addr);
-	address.sin_port=htons(atoi(port.c_str()));
-	listenfd=socket(PF_INET, SOCK_STREAM, 0);
+	
 
 	struct linger linger;
 	linger.l_onoff = 1;
 	//指定调用close后 5s回收资源
 	linger.l_linger = 5;
-	setsockopt(listenfd, SOL_SOCKET, SO_LINGER, (char *) &linger, sizeof(linger));
+	setsockopt(socketfd, SOL_SOCKET, SO_LINGER, (char *) &linger, sizeof(linger));
 
-	if(listenfd<0)
+	if(socketfd<0)
 		throw std::runtime_error("socket 创建失败\n");
-	int ret=bind(listenfd, (struct sockaddr*)&address, sizeof(address));
+	int ret=bind(socketfd, (struct sockaddr*)&address, sizeof(address));
 	if(ret==-1)
 		throw std::runtime_error("socket 绑定失败\n");
-	ret=listen(listenfd, 5);
+	ret=listen(socketfd, 5);
 	if(ret==-1)
 		throw std::runtime_error("socket 监听失败\n");
-	return listenfd;
+	return socketfd;
 }
 int SocketManager::getListenfd() const {
-	return listenfd;
+	return socketfd;
 }
 
-
 SocketManager::SocketManager(std::string ipAddr, std::string port):ipAddr(ipAddr), port(port){
-	listenfd=-1;
+	socketfd=-1;
 }
 
 SocketManager::~SocketManager(){
-	if(listenfd>=0)
-		close(listenfd);
+	if(socketfd>=0)
+		close(socketfd);
+}
+
+int SocketManager::createSocket(){
+	if(used==false){
+		bzero(&address, sizeof(address));
+		address.sin_family=AF_INET;
+		inet_pton(AF_INET, ipAddr.c_str() , &address.sin_addr);
+		address.sin_port=htons(atoi(port.c_str()));
+		socketfd=socket(PF_INET, SOCK_STREAM, 0);
+		used=true;
+	}else{
+		return -1;
+	}
+	return 1;
 }

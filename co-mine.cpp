@@ -552,15 +552,20 @@ int main(void)
 	int pipeToSocket1[2], pipeToSocket2[2];
 	pipe(pipeToSocket1);
 	pipe(pipeToSocket2);
+	SocketManager sock;
 	if(mode==1){
 		//TODO::扫描端口,空闲使用
+		//TODO::这里是否可以选择不用if-else 语句来实现
 		std::string ipAddr, port;
-		cout<<"请输入对方Ip";
-		std::function<bool(string)> tmp=[](std::string hello){return true;};
+		cout<<"请输入对方Ip(如果输入127.0.0.1 ,则进行本地监听,等待对方连接)";
 		inputUntilTrue(ipAddr, "输入判断失败,请重试|input error, try again", [](decltype(ipAddr) mode){return true;});
-		//inputUntilTrue(port, "输入判断失败,请重试|input error, try again", [](decltype(ipAddr) mode){return true;});
-		inputUntilTrue(port, "输入判断失败,请重试|input error, try again", tmp);
-		//SocketManager("");
+		if(ipAddr!="127.0.0.1"){
+			cout<<"请输入对方端口";
+			inputUntilTrue(port, "输入判断失败,请重试|input error, try again", [](decltype(ipAddr) mode){return true;});
+			sock.setIpAddrPort(ipAddr, port);
+		}else{
+			sock.setIpAddrPort(ipAddr);
+		}
 	}
 	pid_t pid;
 	pid=fork();
