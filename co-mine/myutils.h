@@ -22,7 +22,7 @@ public:
 	//自动使用connect
 	SocketManager(std::string ipAddr="127.0.0.1", std::string port="53286");
 	void setIpAddrPort(std::string ipaddr, std::string port="53286");
-	bool connect(std::string ipAddr, std::string port="53286");
+	int connect(std::string ipAddr, std::string port="53286");
 	int getSocketOpt(int level, int optname, void *optval, socklen_t *optlen) const;
 	int setSokcetOpt(int level, int optname, void *optval, socklen_t *optlen);
 	~SocketManager();
@@ -34,7 +34,7 @@ public:
 //TODO::设置一个用函数而非模板作为参数的inputUntilTrue
 template<typename T>
 void inputUntilTrue(T& tobeInput, std::string& msg, std::function<bool(T)> judgeFunc){
-	std::cout<<"in the function"<<std::endl;
+	//std::cout<<"in the function"<<std::endl;
 	while(!(std::cin>>tobeInput)||!judgeFunc(tobeInput)){
 		std::cin.clear();
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');
@@ -44,7 +44,7 @@ void inputUntilTrue(T& tobeInput, std::string& msg, std::function<bool(T)> judge
 
 template<typename T,  typename F>
 void inputUntilTrue(T& tobeInput, std::string msg, F judgeFunc){
-	std::cout<<"in the template"<<std::endl;
+	//std::cout<<"in the template"<<std::endl;
 	while(!(std::cin>>tobeInput)||!judgeFunc(tobeInput)){
 		std::cin.clear();
 		std::cin.ignore(std::numeric_limits<std::streamsize>::max(),'\n');

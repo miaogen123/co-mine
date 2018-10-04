@@ -31,17 +31,28 @@ int SocketManager::setSokcetOpt(int level, int optname, void *optval, socklen_t 
 }
 
 
-void inline SocketManager::setIpAddrPort(std::string ipaddr, std::string port_argu){
+void  SocketManager::setIpAddrPort(std::string ipaddr, std::string port_argu){
 	ipAddr=ipaddr, port=port_argu;
 }
 
-bool SocketManager::connect(std::string ipaddr, std::string port_argu){
+int SocketManager::connect(std::string ipaddr, std::string port_argu){
 	ipAddr=ipaddr, port=port_argu;
 	if(createSocket()==-1){
 		std::cout<<" this socket has been  used as listen socket "<<std::endl;
 		return -1;
 	}
-	::connect(socketfd,(struct sockaddr*)&address, sizeof(address));
+	if(::connect(socketfd,(struct sockaddr*)&address, sizeof(address))<0){
+		std::cout<<"connect error"<<std::endl;
+		this->~SocketManager();
+		return -1;
+	}
+	//while(true){
+	//	char buf[10];
+	//	memset(buf, 0,10*sizeof(int));
+	//	recv(socketfd, buf, 10, MSG_DONTWAIT);
+	//	std::cout<<buf<<std::endl;
+	//	send(socketfd, "quuuuu", 7, MSG_NOSIGNAL);
+	//}
 	return socketfd;
 }
 
@@ -51,11 +62,10 @@ int SocketManager::bindAndListenSocket(std::string ipaddr, std::string port_argu
 		std::cout<<" this socket has been  used as connect socket "<<std::endl;
 		return -1;
 	}
-	
 
+	//指定调用close后 5s回收资源
 	struct linger linger;
 	linger.l_onoff = 1;
-	//指定调用close后 5s回收资源
 	linger.l_linger = 5;
 	setsockopt(socketfd, SOL_SOCKET, SO_LINGER, (char *) &linger, sizeof(linger));
 
@@ -67,7 +77,14 @@ int SocketManager::bindAndListenSocket(std::string ipaddr, std::string port_argu
 	ret=listen(socketfd, 5);
 	if(ret==-1)
 		throw std::runtime_error("socket 监听失败\n");
-	return socketfd;
+	auto connfd=accept(socketfd, (struct sockaddr*)&address, (unsigned int*	)(&(address)));
+	//while(true){
+	//	send(connfd, "quuuuu", 7, MSG_NOSIGNAL);
+	//	char buf[10];
+	//	recv(connfd, buf, 10, MSG_DONTWAIT);
+	//	std::cout<<buf<<std::endl;
+	//}
+	return connfd;
 }
 int SocketManager::getListenfd() const {
 	return socketfd;

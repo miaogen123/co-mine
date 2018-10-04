@@ -1,6 +1,5 @@
 //程序在linux下实现字符扫雷，独立完成
 //这个程序之前是纯c写的，后来改成C++
-
 #include<iostream>
 #include<functional>
 #include<limits>
@@ -22,10 +21,11 @@ using namespace std;
 #define FALSE 0
 #define MATRIX 16           //定义扫雷的最大阶数
 #define MINIMUN 9           //定义最小的扫雷阶数
+#define MINE_VAL 20			//雷的数值
 //判断（x，y）是否在矩阵内部
 #define JUDGE(x,y)  ((x)>-1&&(x)<MATRIX&&(y)>-1&&(y)<MATRIX?TRUE:FALSE)
 int matrix;  //全局变量用来记录用户的输入
-#define JUDGEMINE(x, y) ((mine[x][y])==20?'A':mine[x][y])
+#define JUDGEMINE(x, y) ((mine[x][y])==MINE_VAL?'A':mine[x][y])
 // 清除屏幕
 #define CLEAR() printf("\033[2J")
 // 上移光标
@@ -41,6 +41,7 @@ int matrix;  //全局变量用来记录用户的输入
 //xianshi 
 #define SHOW_CURSOR() printf("\033[?25h")
 //用于操作光标， 无需键入回车即可    参数：空  返回值：返回输入的键的 acsii码
+
 int scanKeyboard()
 {
 	int in;
@@ -69,12 +70,12 @@ void InitializeMine(int mine[MATRIX][MATRIX])
         {
             for(countsec=0;countsec<matrix;countsec++)
             {
-                randnum=rand()%8+19;//20有雷
-                if(mine[countone][countsec]==20)
+                randnum=rand()%8+19;//MINE_VAL有雷
+                if(mine[countone][countsec]==MINE_VAL)
                 {
                   continue;
                 }
-                else if(randnum==20 )
+                else if(randnum==MINE_VAL )
                 {
                     if(minenum==amount)
                     {
@@ -99,46 +100,46 @@ void InitializeMine(int mine[MATRIX][MATRIX])
 		for (countsec = 0; countsec<matrix; countsec++)
 		{
 			minenum = 0;
-			if (mine[countone][countsec] != 20)         //通过判断找出中心格周围的雷数
+			if (mine[countone][countsec] != MINE_VAL)         //通过判断找出中心格周围的雷数
 			{
 				if (JUDGE(countone - 1, countsec - 1))
 				{
-					if (mine[countone-1][countsec-1] == 20)
+					if (mine[countone-1][countsec-1] == MINE_VAL)
 						minenum++;
 				}
 				if (JUDGE(countone - 1, countsec))
 				{
-					if (mine[countone - 1][countsec] == 20)
+					if (mine[countone - 1][countsec] == MINE_VAL)
 						minenum++;
 				}
 				if (JUDGE(countone - 1, countsec + 1) )
 				{
-					if (mine[countone - 1][countsec + 1] == 20)
+					if (mine[countone - 1][countsec + 1] == MINE_VAL)
 						minenum++;
 				}
 				if (JUDGE(countone, countsec - 1))
 				{
-					if (mine[countone][countsec - 1]==20)
+					if (mine[countone][countsec - 1]==MINE_VAL)
 						minenum++;
 				}
 				if (JUDGE(countone, countsec + 1))
 				{
-					if (mine[countone][countsec + 1] == 20)
+					if (mine[countone][countsec + 1] == MINE_VAL)
 						minenum++;
 				}
 				if (JUDGE(countone + 1, countsec - 1))
 				{
-					if (mine[countone + 1][countsec - 1] == 20)
+					if (mine[countone + 1][countsec - 1] == MINE_VAL)
 						minenum++;
 				}
 				if (JUDGE(countone + 1, countsec))
 				{
-					if (mine[countone + 1][countsec] == 20)
+					if (mine[countone + 1][countsec] == MINE_VAL)
 						minenum++;
 				}
 				if (JUDGE(countone + 1, countsec + 1))
 				{
-					if (mine[countone + 1][countsec + 1] == 20)
+					if (mine[countone + 1][countsec + 1] == MINE_VAL)
 						minenum++;
 				}
 				mine[countone][countsec] = minenum;         //中心格上记录周围的雷数
@@ -175,8 +176,6 @@ void Initialize(void)
     }
     printf("\n");
 }
-
-
 //光标移动函数  参数：行列 返回值：空
 void MoveCursor(int row ,int col) {
   RESET_CURSOR();
@@ -250,7 +249,7 @@ void BomMine(int mine[MATRIX][MATRIX])
       {
         for(countsec=0;countsec<matrix;countsec++)
         {
-              if(mine[countone][countsec]==20)
+              if(mine[countone][countsec]==MINE_VAL)
               {
                   MoveCursor(countone+1, countsec+1);
                   printf("\033[40;31;1mMN\033[40;30;0m" );
@@ -281,7 +280,6 @@ void BomMine(int mine[MATRIX][MATRIX])
       printf("     ******   ***             ******   ***                 \n");
       exit(1);
 }
-
 //点击后找出所有的周围无雷的格子并显示为空   参数：行，列，雷的数组， 标志数组
 void Set_Blank(int row, int col, int mine[MATRIX][MATRIX], int flag[MATRIX][MATRIX])
 {
@@ -359,7 +357,7 @@ void Set_Blank(int row, int col, int mine[MATRIX][MATRIX], int flag[MATRIX][MATR
 //参数 雷阵，标志数组， 行列
 void DisplayCursor(int mine[MATRIX][MATRIX], int flag[MATRIX][MATRIX],  int row, int col)
 {
-    if(mine[row-1][col-1]==20)
+    if(mine[row-1][col-1]==MINE_VAL)
     {
       BomMine(mine);
     }
@@ -377,7 +375,6 @@ void DisplayCursor(int mine[MATRIX][MATRIX], int flag[MATRIX][MATRIX],  int row,
 //显示youwin   参数返回值空
 void YouWin(void)
 {
-
   CLEAR();
   RESET_CURSOR();
   printf(" ***       ***      ***       @      *** *******           *****                 \n");
@@ -399,7 +396,6 @@ void StartGame()
     int minenumber=0;
     srand((unsigned long)time(0));
     printf("please input the dimension of the matrix(9~16)\n");
-	
     while(!(cin>>matrix)||(matrix>MATRIX||matrix<MINIMUN))
     {
 		cin.clear();
@@ -470,7 +466,6 @@ void StartGame()
 				col--;
 				Sub_MoveCursor(row, col, 1);
 			}
-
 		}
 		else if(state=='L')
 		{
@@ -498,7 +493,6 @@ void StartGame()
 			RESET_CURSOR();
             MoveCursor(matrix+2, 1);
             printf("mineremain=%d     \n", mineremain  );
-
           }
         }
         else if(state=='B')
@@ -506,13 +500,13 @@ void StartGame()
           if(flag[row-1][col-1]!=1&&flag[row-1][col-1]!=2)
           {
             MoveCursor(row,col);
-            printf("\033[40;31;1m@\033[40;30;0m");
+			printf("\033[40;31;1m@\033[40;30;0m");
             flag[row-1][col-1]=2;
             mineremain--;
             RESET_CURSOR();
             MoveCursor(matrix+2, 1);
             printf("mineremain=%d     \n", mineremain  );
-            if(mine[row-1][col-1]==20)
+            if(mine[row-1][col-1]==MINE_VAL)
             {
               true_mineremain--;
 			  if(true_mineremain==0)
@@ -528,7 +522,6 @@ void StartGame()
 }
 int main(void)
 {
-	
 	ios::sync_with_stdio(false);
 	printf("wel come to the game\n");
 	printf("attention: this game use \"I K J L\" to move up or down or left or right\n");
@@ -536,9 +529,7 @@ int main(void)
 	printf("首先请选择你要进行单机模式,还是对战模式\n");
 	printf("1, 对战模式\n");
 	printf("2, 单机模式\n");
-
 	int mode=0;
-
 	while(!(cin>>mode)||!(mode==1||mode==2)){
 		if(!cin){
 			cin.clear();
@@ -557,14 +548,15 @@ int main(void)
 		//TODO::扫描端口,空闲使用
 		//TODO::这里是否可以选择不用if-else 语句来实现
 		std::string ipAddr, port;
-		cout<<"请输入对方Ip(如果输入127.0.0.1 ,则进行本地监听,等待对方连接)";
+		cout<<"请输入对方Ip(如果输入为1 ,则进行本地监听,等待对方连接)";
 		inputUntilTrue(ipAddr, "输入判断失败,请重试|input error, try again", [](decltype(ipAddr) mode){return true;});
-		if(ipAddr!="127.0.0.1"){
+		if(ipAddr!="1"){
 			cout<<"请输入对方端口";
 			inputUntilTrue(port, "输入判断失败,请重试|input error, try again", [](decltype(ipAddr) mode){return true;});
-			sock.setIpAddrPort(ipAddr, port);
+			auto fd=sock.connect(ipAddr, port);
 		}else{
-			sock.setIpAddrPort(ipAddr);
+			auto fd=sock.bindAndListenSocket("127.0.0.1");
+			cout<<fd<<endl;
 		}
 	}
 	pid_t pid;
@@ -578,4 +570,3 @@ int main(void)
 	}
     return 0;
 }
-
