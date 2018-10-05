@@ -9,6 +9,7 @@
 #include<limits>
 #include<functional>
 #include<iostream>
+
 class SocketManager{
 private:
 	std::string ipAddr, port;
