@@ -23,13 +23,19 @@ public:
 	void Initialize(void);
 	void InitializeMine(int mine[MAX_DIM][MAX_DIM]);
 	bool judge(int x, int y);
+	void writeTofd(int fd);
+	void process();
 
 
 private:
 	//单例模式只调用一次
 	const int matrixDim;
-	MineGame(int dim);
+	const int  MINE_VAL = 20;			//雷的数值
+	unsigned int userID;
+	//一条指令两个字节：字符+userID
+	const size_t commandSize = 2;
 
+	MineGame(int dim);
 	Display* toScreen;
 	std::shared_ptr<Communicate> Com;
 
@@ -39,9 +45,4 @@ private:
     char  state;
     int mineremain=0, true_mineremain=0;
 
-	const int  MINE_VAL = 20;			//雷的数值
 };
-
-//静态变量提前声明
-//MineGame* MineGame::uni_instance = nullptr;
-

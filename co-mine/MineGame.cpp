@@ -1,15 +1,22 @@
 #include "MineGame.h"
+#include<future>
+#include<thread>
 #include<termio.h>
 #include<sys/ioctl.h>
 #include<array>
+#include<random>
 #include<unistd.h>
 #include<curses.h>
+#include<stdexcept>
 #include<memory>
 
 
 MineGame::MineGame(int dim):matrixDim(dim){
 	toScreen=new Display();
-	Com=std::make_shared<Communicate>();
+	Com=std::make_shared<Communicate>(2);
+	std::default_random_engine e;
+	std::uniform_int_distribution<int>  uniID(0, 65535);
+	userID =uniID(e);
 }
 
 MineGame::~MineGame()
@@ -24,6 +31,98 @@ MineGame * MineGame::getMineGame(int dim){
 
 bool MineGame::judge(int x, int y) {
 	return x > -1 && x < matrixDim && y > -1 && y < matrixDim ? true : false;
+}
+
+void MineGame::writeTofd(int fd)
+{
+	while(true){
+		char state=(char)scanKeyboard();
+		write(fd, static_cast<void *>(&state), 1);
+	}
+}
+
+void MineGame::process()
+{
+    while(true){
+		auto command=Com->waitAndGetData(commandSize);
+		char state = command[0];
+		printf("...i\n");
+		if(count!=1){
+			Sub_MoveCursor(row, col, 0);
+		}
+		count++;
+		if(state=='I'){
+			if(row==1){
+				row=matrixDim;
+				Sub_MoveCursor(row, col, 1);
+			}
+			else{
+				row--;
+				Sub_MoveCursor(row, col, 1);
+			}
+		}
+		else if(state=='K'){
+			if(row==matrixDim){
+				row=1;
+				Sub_MoveCursor(row, col, 1);
+			}
+			else{
+				row++;
+				Sub_MoveCursor(row, col, 1);
+			}
+		}
+		else if(state=='J') {
+			if(col==1){
+				col=matrixDim;
+				Sub_MoveCursor(row, col, 1);
+			}
+			else{
+				col--;
+				Sub_MoveCursor(row, col, 1);
+			}
+		}
+		else if(state=='L'){
+			if(col==matrixDim){
+				col=1;
+				Sub_MoveCursor(row, col, 1);
+			}
+			else{
+				col++;
+				Sub_MoveCursor(row, col, 1);
+			}
+		}
+        else if(state=='A'){
+          if(flag[row-1][col-1]!=1&&flag[row-1][col-1]!=2){
+            DisplayCursor(mine, flag, row, col);
+          }
+          if(flag[row-1][col-1]==2){
+            DisplayCursor(mine, flag, row, col);
+			mineremain++;
+			Display::reset();
+            Display::moveTo(matrixDim+2, 1);
+            printf("mineremain=%d     \n", mineremain  );
+          }
+        }
+        else if(state=='B'){
+          if(flag[row-1][col-1]!=1&&flag[row-1][col-1]!=2){
+            Display::moveTo(row,col);
+			printf("\033[40;31;1m@\033[40;30;0m");
+            flag[row-1][col-1]=2;
+            mineremain--;
+            Display::reset();
+            Display::moveTo(matrixDim+2, 1);
+            printf("mineremain=%d     \n", mineremain  );
+            if(mine[row-1][col-1]==MINE_VAL){
+              true_mineremain--;
+			  if(true_mineremain==0){
+				  YouWin();
+			  }
+            }
+          }
+		}
+        Display::reset();
+		Display::moveDown(matrixDim+2);
+    }
 }
 
 int MineGame::scanKeyboard()
@@ -73,50 +172,40 @@ void MineGame::InitializeMine(int mine[MAX_DIM][MAX_DIM])
           }
     }
 	//进行循环遍历，查找出对应雷区四周的雷的数目
-	for (countone = 0; countone<matrixDim; countone++)
-	{
-		for (countsec = 0; countsec<matrixDim; countsec++)
-		{
+	for (countone = 0; countone<matrixDim; countone++){
+		for (countsec = 0; countsec<matrixDim; countsec++){
 			minenum = 0;
 			if (mine[countone][countsec] != MINE_VAL)         //通过判断找出中心格周围的雷数
 			{
-				if (judge(countone - 1, countsec - 1))
-				{
+				if (judge(countone - 1, countsec - 1)){
 					if (mine[countone-1][countsec-1] == MINE_VAL)
 						minenum++;
 				}
-				if (judge(countone - 1, countsec))
-				{
+				if (judge(countone - 1, countsec)){
 					if (mine[countone - 1][countsec] == MINE_VAL)
 						minenum++;
 				}
-				if (judge(countone - 1, countsec + 1) )
-				{
+				if (judge(countone - 1, countsec + 1) ){
 					if (mine[countone - 1][countsec + 1] == MINE_VAL)
 						minenum++;
 				}
-				if (judge(countone, countsec - 1))
-				{
+				if (judge(countone, countsec - 1)){
 					if (mine[countone][countsec - 1]==MINE_VAL)
 						minenum++;
 				}
-				if (judge(countone, countsec + 1))
-				{
+				if (judge(countone, countsec + 1)){
 					if (mine[countone][countsec + 1] == MINE_VAL)
 						minenum++;
 				}
-				if (judge(countone + 1, countsec - 1))
-				{
+				if (judge(countone + 1, countsec - 1)){
 					if (mine[countone + 1][countsec - 1] == MINE_VAL)
 						minenum++;
 				}
-				if (judge(countone + 1, countsec))
-				{
+				if (judge(countone + 1, countsec)){
 					if (mine[countone + 1][countsec] == MINE_VAL)
 						minenum++;
 				}
-				if (judge(countone + 1, countsec + 1))
-				{
+				if (judge(countone + 1, countsec + 1)){
 					if (mine[countone + 1][countsec + 1] == MINE_VAL)
 						minenum++;
 				}
@@ -134,20 +223,16 @@ void MineGame::Initialize(void)
         for(countsec=0;countsec<matrixDim;countsec++){
               printf("#   ");
         }
-        if(countsec==matrixDim)
-        {
+        if(countsec==matrixDim){
             printf("%d", countone+1);
             printf("\n");
         }
     }
-    for(countone=1;countone<=matrixDim;countone++)
-    {
-      if(countone<10)
-      {
+    for(countone=1;countone<=matrixDim;countone++){
+      if(countone<10){
               printf("%d   ", countone);
       }
-      else
-      {
+      else{
         printf("%d  ", countone);
       }
     }
@@ -173,12 +258,9 @@ void MineGame::BomMine(int mine[MAX_DIM][MAX_DIM])
       struct winsize ws;
       ioctl(0, TIOCGWINSZ, &ws);
       int countone=0, countsec=0;
-      for(countone=0;countone<matrixDim;countone++)
-      {
-        for(countsec=0;countsec<matrixDim;countsec++)
-        {
-              if(mine[countone][countsec]==MINE_VAL)
-              {
+      for(countone=0;countone<matrixDim;countone++){
+        for(countsec=0;countsec<matrixDim;countsec++){
+              if(mine[countone][countsec]==MINE_VAL){
                   Display::moveTo(countone+1, countsec+1);
                   printf("\033[;31;1mMN\033[;30;0m" );
               }
@@ -187,10 +269,8 @@ void MineGame::BomMine(int mine[MAX_DIM][MAX_DIM])
       fflush(stdout);
       sleep(3);
       Display::reset();
-      for(countone=0;countone<matrixDim+10;countone++)
-      {
-          for(countsec=0;countsec<(int)ws.ws_col;++countsec)
-          {
+      for(countone=0;countone<matrixDim+10;countone++){
+          for(countsec=0;countsec<(int)ws.ws_col;++countsec){
             printf(" ");
           }
           printf("\n");
@@ -211,92 +291,79 @@ void MineGame::BomMine(int mine[MAX_DIM][MAX_DIM])
 //点击后找出所有的周围无雷的格子并显示为空   参数：行，列，雷的数组， 标志数组
 void MineGame::Set_Blank(int row, int col, int mine[MAX_DIM][MAX_DIM], int flag[MAX_DIM][MAX_DIM])
 {
-  if(mine[row][col]>0)
-  {
+  if(mine[row][col]>0){
     Display::moveTo(row+1, col+1);
     flag[row][col]=1;
     printf("\033[40;32;1m%d \033[40;30;0m" , mine[row][col]);
     return ;
   }
-  else if(mine[row][col]==-1)
-  {
+  else if(mine[row][col]==-1){
     return ;
   }
-  else if(mine[row][col]==0)
-  {
+  else if(mine[row][col]==0){
     Display::moveTo(row+1,  col+1);
     flag[row][col]=1;
     fprintf(stdout, " ");
     mine[row][col]=-1;
-    if(row==0&&col==0)
-    {
+    if(row==0&&col==0){
       Set_Blank(row+1, col, mine, flag);
       Set_Blank(row, col+1, mine, flag);
     }
-    if(row==0&&(col>0&&col<matrixDim-1))
-    {
+    if(row==0&&(col>0&&col<matrixDim-1)){
       Set_Blank(row, col-1, mine, flag);
       Set_Blank(row, col+1, mine, flag);
       Set_Blank(row+1, col, mine, flag);
     }
-    if(row==0&&col==matrixDim-1)
-    {
+    if(row==0&&col==matrixDim-1){
       Set_Blank(row, col-1, mine, flag);
       Set_Blank(row+1, col, mine, flag);
     }
-    if((row<matrixDim-1&&row>0)&&col==0)
-    {
+    if((row<matrixDim-1&&row>0)&&col==0){
       Set_Blank(row-1, col, mine, flag);
       Set_Blank(row+1, col, mine, flag);
       Set_Blank(row, col+1, mine, flag);
     }
-    if((row<matrixDim-1&&row>0)&&(col>0&&col<matrixDim-1))
-    {
+    if((row<matrixDim-1&&row>0)&&(col>0&&col<matrixDim-1)){
       Set_Blank(row-1, col, mine, flag);
       Set_Blank(row+1, col, mine, flag);
       Set_Blank(row, col+1, mine, flag);
       Set_Blank(row, col-1, mine, flag);
     }
-    if((row<matrixDim-1&&row>0)&&col==matrixDim-1)
-    {
+    if((row<matrixDim-1&&row>0)&&col==matrixDim-1){
       Set_Blank(row-1, col, mine, flag);
       Set_Blank(row+1, col, mine, flag);
       Set_Blank(row, col-1, mine, flag);
     }
-    if(row==matrixDim-1&&col==0)
-    {
+    if(row==matrixDim-1&&col==0){
       Set_Blank(row-1, col, mine, flag);
       Set_Blank(row, col+1, mine, flag);
     }
-    if(row==matrixDim-1&&(col>0&&col<matrixDim-1))
-    {
+    if(row==matrixDim-1&&(col>0&&col<matrixDim-1)){
       Set_Blank(row-1, col, mine, flag);
       Set_Blank(row, col-1, mine, flag);
       Set_Blank(row, col+1, mine, flag);
     }
-    if(row==matrixDim-1&&col==matrixDim-1)
-    {
+    if(row==matrixDim-1&&col==matrixDim-1){
       Set_Blank(row, col-1, mine, flag);
       Set_Blank(row-1, col, mine, flag);
     }
   }
 }
+
 //显示某位置的内容，有雷就炸，以此格子为中心的九宫格内有雷，则显示雷的数目，没雷则显示相连的空白  
 //参数 雷阵，标志数组， 行列
 void MineGame::DisplayCursor(int mine[MAX_DIM][MAX_DIM], int flag[MAX_DIM][MAX_DIM],  int row, int col)
 {
-    if(mine[row-1][col-1]==MINE_VAL)
-    {
+    if(mine[row-1][col-1]==MINE_VAL){
       BomMine(mine);
     }
-    else if(mine[row-1][col-1]!=0)
-    {
+    else if(mine[row-1][col-1]!=0){
       Display::moveTo(row, col);
       flag[row-1][col-1]=1;
       printf("\033[40;32;1m%d \033[40;30;0m", mine[row-1][col-1]);
     }
     else// diguibianlikongge MINE[row-1][col-1]==0
-    {
+	{
         Set_Blank(row-1,  col-1, mine, flag);
     }
 }
@@ -328,111 +395,22 @@ void MineGame::run()
     printf("mineremain=%d     \n", mineremain  );
 	count=0;
 	int err=0;
-    while(1)
-    {
-		/*err=pthread_creat(&tid, NULL, (void*)getch, NULL);*/
-		/*if(err==0)*/
-		/*{*/
-			/*printf("pthread create error, prggram adbort\n");*/
-			/*return 0;*/
-		/*}*/
-		state=(char)scanKeyboard();
-		printf("...i\n");
-		if(count!=1)
-		{
-			Sub_MoveCursor(row, col, 0);
-		}
-		count++;
-		if(state=='I')
-		{
-			if(row==1)
-			{
-				row=matrixDim;
-				Sub_MoveCursor(row, col, 1);
-			}
-			else
-			{
-				row--;
-				Sub_MoveCursor(row, col, 1);
-			}
-		}
-		else if(state=='K')
-		{
-			if(row==matrixDim)
-			{
-				row=1;
-				Sub_MoveCursor(row, col, 1);
-			}
-			else
-			{
-				row++;
-				Sub_MoveCursor(row, col, 1);
-			}
-		}
-		else if(state=='J') 
-		{
-			if(col==1)
-			{
-				col=matrixDim;
-				Sub_MoveCursor(row, col, 1);
-			}
-			else
-			{
-				col--;
-				Sub_MoveCursor(row, col, 1);
-			}
-		}
-		else if(state=='L')
-		{
-			if(col==matrixDim)
-			{
-				col=1;
-				Sub_MoveCursor(row, col, 1);
-			}
-			else
-			{
-				col++;
-				Sub_MoveCursor(row, col, 1);
-			}
-		}
-        else if(state=='A')
-        {
-          if(flag[row-1][col-1]!=1&&flag[row-1][col-1]!=2)
-          {
-            DisplayCursor(mine, flag, row, col);
-          }
-          if(flag[row-1][col-1]==2)
-          {
-            DisplayCursor(mine, flag, row, col);
-			mineremain++;
-			Display::reset();
-            Display::moveTo(matrixDim+2, 1);
-            printf("mineremain=%d     \n", mineremain  );
-          }
-        }
-        else if(state=='B')
-        {
-          if(flag[row-1][col-1]!=1&&flag[row-1][col-1]!=2)
-          {
-            Display::moveTo(row,col);
-			printf("\033[40;31;1m@\033[40;30;0m");
-            flag[row-1][col-1]=2;
-            mineremain--;
-            Display::reset();
-            Display::moveTo(matrixDim+2, 1);
-            printf("mineremain=%d     \n", mineremain  );
-            if(mine[row-1][col-1]==MINE_VAL)
-            {
-              true_mineremain--;
-			  if(true_mineremain==0)
-			  {
-				  YouWin();
-			  }
-            }
-          }
-		}
-        Display::reset();
-		Display::moveDown(matrixDim+2);
-    }
+	int stdinToListenSource[2];
+	{	int tmpCountTry = 0;
+	while (pipe(stdinToListenSource) != 0) {
+		tmpCountTry++;
+		if (tmpCountTry >= 5)
+			throw std::runtime_error("管道映射失败, 程序无法继续运行");
+		sleep(0.5);
+	}    }
+	this->Com->addfd(stdinToListenSource[0]);
+	//state=(char)scanKeyboard();
+	//write(stdinToListenSource[1], static_cast<void *>(&state), 1);
+
+ 	//TODO::搞明白下面 代码
+	//auto retFu = std::async(std::launch::async, writeTofd, stdinToListenSource[1]);
+	std::thread getChar(writeTofd, stdinToListenSource[1]);
+	getChar.detach();
+
 }
 

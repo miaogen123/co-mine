@@ -1,5 +1,5 @@
 target=co-mine
-obj= co-mine.o  myutils.o MineGame.o  Display.o Communicate.o
+obj= co-mine.o  myutils.o MineGame.o  Display.o Communicate.o SocketManager.o
 
 $(target):  $(obj)
 		  $(CXX) -o $@ $^
@@ -13,5 +13,7 @@ Display.o :Display.cpp
 		 $(CXX)  -c Display.cpp
 Communicate.o :Communicate.cpp
 		 $(CXX)  -c Communicate.cpp
+SocketManager.o :SocketManager.cpp
+		 $(CXX)  -c SocketManager.cpp
 clean:
 		rm $(target)|rm *.o 

@@ -3,9 +3,9 @@
 
 #include<iostream>
 #include<cstdio>
-#include<unistd.h>
 #include"myutils.h"
 #include"MineGame.h"
+#include"SocketManager.h"
 
 using namespace std;
 
@@ -20,9 +20,6 @@ int main(void)
 	printf("2, 单机模式\n");
 	int mode=0;
 	inputUntilTrue(mode, "请输入1或者2", [](decltype(mode) a) {return a == 1 || a == 2; });
-	int pipeToSocket1[2], pipeToSocket2[2];
-	pipe(pipeToSocket1);
-	pipe(pipeToSocket2);
 	SocketManager sock;
 	if(mode==1){
 		//TODO::扫描端口,空闲使用
@@ -36,21 +33,15 @@ int main(void)
 			auto fd=sock.connect(ipAddr, port);
 		}else{
 			auto fd=sock.bindAndListenSocket("127.0.0.1");
-			cout<<fd<<endl;
 		}
 	}
-	pid_t pid;
-	pid=fork();
-	if(pid<0){
-		cout << "进程创建失败" << endl;;
-	}else if(pid>0){
-		int matrixDim = 9;
-		printf("please input the dimension of the matrix(9~16)\n");
-		inputUntilTrue(matrixDim, "input error , please iput again\n", [](decltype(matrixDim) a) {return a <= MAX_DIM&& a >= MIN_DIM; });
-		MineGame *pMG=MineGame::getMineGame(matrixDim);
-		pMG->run();
-	}else{
-		wait();
-	}
+
+	//game
+	int matrixDim = 9;
+	printf("please input the dimension of the matrix(9~16)\n");
+	inputUntilTrue(matrixDim, "input error , please iput again\n", [](decltype(matrixDim) a) {return a <= MAX_DIM&& a >= MIN_DIM; });
+	MineGame *pMG=MineGame::getMineGame(matrixDim);
+	pMG->run();
+
     return 0;
 }

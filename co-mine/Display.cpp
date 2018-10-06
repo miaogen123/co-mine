@@ -47,7 +47,7 @@ void Display::showSthAt(unsigned int x, unsigned int y, std::string content){
 void Display::showSthAt(unsigned int x, unsigned int y, std::string content, FontColor before, FontColor after){
 	printf("\033[%d;%dH", x, 4*(y-1)+1);
 	//仅支持替换字体颜色
-	printf("\033[;%d;1m%s\033[;%d;0m",before, content.c_str(), after);
+	printf("\033[;%d;1m%s\033[;%d;0m",static_cast<unsigned short>(before), content.c_str(), static_cast<unsigned short>(after));
 	fflush(stdout);
 }
 
