@@ -15,13 +15,13 @@ public:
 	static MineGame* getMineGame(int dim);
 	int scanKeyboard(); 
 	void run();
-	void DisplayCursor(int mine[MAX_DIM][MAX_DIM], int flag[MAX_DIM][MAX_DIM], int row, int col);
+	void DisplayCursor(int row, int col);
 	void YouWin(void);
-	void Set_Blank(int row, int col, int mine[MAX_DIM][MAX_DIM], int flag[MAX_DIM][MAX_DIM]);
-	void BomMine(int mine[MAX_DIM][MAX_DIM]);
+	void Set_Blank(int row, int col);
+	void BomMine();
 	void Sub_MoveCursor(int row, int col, int flag);//flag的作用在于 是1时显示光标 是0时重画屏幕
 	void Initialize(void);
-	void InitializeMine(int mine[MAX_DIM][MAX_DIM]);
+	void InitializeMine();
 	bool judge(int x, int y);
 	void writeTofd(int fd);
 	void process();
@@ -34,6 +34,8 @@ private:
 	unsigned int userID;
 	//一条指令两个字节：字符+userID
 	const size_t commandSize = 2;
+	int mine[MAX_DIM][MAX_DIM];
+	int flag[MAX_DIM][MAX_DIM];
 
 	MineGame(int dim);
 	Display* toScreen;

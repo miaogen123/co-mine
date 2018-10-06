@@ -93,10 +93,10 @@ void MineGame::process()
 		}
         else if(state=='A'){
           if(flag[row-1][col-1]!=1&&flag[row-1][col-1]!=2){
-            DisplayCursor(mine, flag, row, col);
+            DisplayCursor( row, col);
           }
           if(flag[row-1][col-1]==2){
-            DisplayCursor(mine, flag, row, col);
+            DisplayCursor( row, col);
 			mineremain++;
 			Display::reset();
             Display::moveTo(matrixDim+2, 1);
@@ -144,7 +144,7 @@ int MineGame::scanKeyboard()
 
 
 //³õÊ¼»¯£¬Íê³É²¼À× ²ÎÊý ·µ»ØÖµ ¿Õ
-void MineGame::InitializeMine(int mine[MAX_DIM][MAX_DIM])
+void MineGame::InitializeMine()
 {
     //ÏÂÃæµÄ±äÁ¿·Ö±ðÓÃÀ´¼ÇÂ¼ ÐÐ½× ÁÐ½× Ó¦ÓÐÀ×µÄÊýÁ¿ ²úÉúµÄËæ»úÊý Êµ¼ÊµÄÀ×ÊýÄ¿
     int countone=0, countsec=0,amount=0,randnum=0, minenum=0;
@@ -253,7 +253,7 @@ void MineGame::Sub_MoveCursor(int row ,int col, int flag)//flagµÄ×÷ÓÃÔÚÓÚ ÊÇ1Ê±Ï
 }
 
 //À×±»Òý±¬ ÏÔÊ¾ËùÓÐµÄÀ× ²¢Êä³ö±¬Õ¨ÌØÐ§  ²ÎÊý£ºÎÞ ·µ»Ø£º¿Õ
-void MineGame::BomMine(int mine[MAX_DIM][MAX_DIM])
+void MineGame::BomMine()
 {
       struct winsize ws;
       ioctl(0, TIOCGWINSZ, &ws);
@@ -289,7 +289,7 @@ void MineGame::BomMine(int mine[MAX_DIM][MAX_DIM])
       exit(1);
 }
 //µã»÷ºóÕÒ³öËùÓÐµÄÖÜÎ§ÎÞÀ×µÄ¸ñ×Ó²¢ÏÔÊ¾Îª¿Õ   ²ÎÊý£ºÐÐ£¬ÁÐ£¬À×µÄÊý×é£¬ ±êÖ¾Êý×é
-void MineGame::Set_Blank(int row, int col, int mine[MAX_DIM][MAX_DIM], int flag[MAX_DIM][MAX_DIM])
+void MineGame::Set_Blank(int row, int col)
 {
   if(mine[row][col]>0){
     Display::moveTo(row+1, col+1);
@@ -306,56 +306,56 @@ void MineGame::Set_Blank(int row, int col, int mine[MAX_DIM][MAX_DIM], int flag[
     fprintf(stdout, " ");
     mine[row][col]=-1;
     if(row==0&&col==0){
-      Set_Blank(row+1, col, mine, flag);
-      Set_Blank(row, col+1, mine, flag);
+      Set_Blank(row+1, col);
+      Set_Blank(row, col+1);
     }
     if(row==0&&(col>0&&col<matrixDim-1)){
-      Set_Blank(row, col-1, mine, flag);
-      Set_Blank(row, col+1, mine, flag);
-      Set_Blank(row+1, col, mine, flag);
+      Set_Blank(row, col-1);
+      Set_Blank(row, col+1);
+      Set_Blank(row+1, col);
     }
     if(row==0&&col==matrixDim-1){
-      Set_Blank(row, col-1, mine, flag);
-      Set_Blank(row+1, col, mine, flag);
+      Set_Blank(row, col-1);
+      Set_Blank(row+1, col);
     }
     if((row<matrixDim-1&&row>0)&&col==0){
-      Set_Blank(row-1, col, mine, flag);
-      Set_Blank(row+1, col, mine, flag);
-      Set_Blank(row, col+1, mine, flag);
+      Set_Blank(row-1, col);
+      Set_Blank(row+1, col);
+      Set_Blank(row, col+1);
     }
     if((row<matrixDim-1&&row>0)&&(col>0&&col<matrixDim-1)){
-      Set_Blank(row-1, col, mine, flag);
-      Set_Blank(row+1, col, mine, flag);
-      Set_Blank(row, col+1, mine, flag);
-      Set_Blank(row, col-1, mine, flag);
+      Set_Blank(row-1, col);
+      Set_Blank(row+1, col);
+      Set_Blank(row, col+1);
+      Set_Blank(row, col-1);
     }
     if((row<matrixDim-1&&row>0)&&col==matrixDim-1){
-      Set_Blank(row-1, col, mine, flag);
-      Set_Blank(row+1, col, mine, flag);
-      Set_Blank(row, col-1, mine, flag);
+      Set_Blank(row-1, col);
+      Set_Blank(row+1, col);
+      Set_Blank(row, col-1);
     }
     if(row==matrixDim-1&&col==0){
-      Set_Blank(row-1, col, mine, flag);
-      Set_Blank(row, col+1, mine, flag);
+      Set_Blank(row-1, col);
+      Set_Blank(row, col+1);
     }
     if(row==matrixDim-1&&(col>0&&col<matrixDim-1)){
-      Set_Blank(row-1, col, mine, flag);
-      Set_Blank(row, col-1, mine, flag);
-      Set_Blank(row, col+1, mine, flag);
+      Set_Blank(row-1, col);
+      Set_Blank(row, col-1);
+      Set_Blank(row, col+1);
     }
     if(row==matrixDim-1&&col==matrixDim-1){
-      Set_Blank(row, col-1, mine, flag);
-      Set_Blank(row-1, col, mine, flag);
+      Set_Blank(row, col-1);
+      Set_Blank(row-1, col);
     }
   }
 }
 
 //ÏÔÊ¾Ä³Î»ÖÃµÄÄÚÈÝ£¬ÓÐÀ×¾ÍÕ¨£¬ÒÔ´Ë¸ñ×ÓÎªÖÐÐÄµÄ¾Å¹¬¸ñÄÚÓÐÀ×£¬ÔòÏÔÊ¾À×µÄÊýÄ¿£¬Ã»À×ÔòÏÔÊ¾ÏàÁ¬µÄ¿Õ°×  
 //²ÎÊý À×Õó£¬±êÖ¾Êý×é£¬ ÐÐÁÐ
-void MineGame::DisplayCursor(int mine[MAX_DIM][MAX_DIM], int flag[MAX_DIM][MAX_DIM],  int row, int col)
+void MineGame::DisplayCursor(int row, int col)
 {
     if(mine[row-1][col-1]==MINE_VAL){
-      BomMine(mine);
+      BomMine();
     }
     else if(mine[row-1][col-1]!=0){
       Display::moveTo(row, col);
@@ -364,7 +364,7 @@ void MineGame::DisplayCursor(int mine[MAX_DIM][MAX_DIM], int flag[MAX_DIM][MAX_D
     }
     else// diguibianlikongge MINE[row-1][col-1]==0
 	{
-        Set_Blank(row-1,  col-1, mine, flag);
+        Set_Blank(row-1,  col-1);
     }
 }
 //ÏÔÊ¾youwin   ²ÎÊý·µ»ØÖµ¿Õ
@@ -381,13 +381,11 @@ void MineGame::YouWin(void)
 //ÓÎÏ·Èë¿Úº¯Êý   ²ÎÊý·µ»ØÖµ£º¿Õ
 void MineGame::run()
 {
-    int mine[MAX_DIM][MAX_DIM]={0};
-    int flag[MAX_DIM][MAX_DIM]={0};
     srand((unsigned long)time(0));
     printf("please wait a monment.....\n");
     Display::clear();
     Display::reset();
-    InitializeMine(mine);
+    InitializeMine();
     sleep(1);
     mineremain=(matrixDim-9)*5+10;
     true_mineremain=mineremain;
@@ -397,11 +395,11 @@ void MineGame::run()
 	int err=0;
 	int stdinToListenSource[2];
 	{	int tmpCountTry = 0;
-	while (pipe(stdinToListenSource) != 0) {
-		tmpCountTry++;
-		if (tmpCountTry >= 5)
-			throw std::runtime_error("¹ÜµÀÓ³ÉäÊ§°Ü, ³ÌÐòÎÞ·¨¼ÌÐøÔËÐÐ");
-		sleep(0.5);
+		while (pipe(stdinToListenSource) != 0) {
+			tmpCountTry++;
+			if (tmpCountTry >= 5)
+				throw std::runtime_error("¹ÜµÀÓ³ÉäÊ§°Ü, ³ÌÐòÎÞ·¨¼ÌÐøÔËÐÐ");
+			sleep(0.5);
 	}    }
 	this->Com->addfd(stdinToListenSource[0]);
 	//state=(char)scanKeyboard();
@@ -409,7 +407,7 @@ void MineGame::run()
 
  	//TODO::¸ãÃ÷°×ÏÂÃæ ´úÂë
 	//auto retFu = std::async(std::launch::async, writeTofd, stdinToListenSource[1]);
-	std::thread getChar(writeTofd, stdinToListenSource[1]);
+	std::thread getChar(&MineGame::writeTofd,this, stdinToListenSource[1]);
 	getChar.detach();
 
 }
