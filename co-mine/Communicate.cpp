@@ -52,7 +52,7 @@ void Communicate::process()
 					std::cout << remain<< std::endl;
 					return remain>Rcount;
 				});
-			//	send(writeTo, innerBuf, Rcount, 0);
+				send(writeTo, innerBuf, Rcount, 0);
 			}
 			else if (fd == writeTo && events[i].events&EPOLLIN) {
 					Rcount = recv(fd,  innerBuf,MAX_BUF, 0);
@@ -87,8 +87,8 @@ void Communicate::process()
 			memset(innerBuf, 0, MAX_BUF);
 #ifdef DEBUG
 		std::cout << "end procesing " << std::endl;
-		cv.notify_one();
 #endif // DEBUG
+		cv.notify_one();
 
 		}
 	}

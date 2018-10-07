@@ -7,7 +7,6 @@
 #include<array>
 #include<random>
 #include<unistd.h>
-#include<curses.h>
 #include<stdexcept>
 #include<memory>
 
@@ -416,11 +415,6 @@ void MineGame::run()
 			sleep(0.5);
 	}    }
 	this->Com->addfd(stdinToListenSource[0]);
-#ifdef DEBUG
-	std::cout << "added" << std::endl;
-#endif
-	//state=(char)scanKeyboard();
-	//write(stdinToListenSource[1], static_cast<void *>(&state), 1);
 
  	//TODO::搞明白下面 代码
 	//auto retFu = std::async(std::launch::async, writeTofd, stdinToListenSource[1]);
@@ -429,7 +423,4 @@ void MineGame::run()
 	std::thread processInput(&MineGame::process, this);
 	processInput.detach();
 	Com->process();
-#ifdef DEBUG
-	std::cout << "ending" << std::endl;
-#endif
 }

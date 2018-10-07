@@ -19,9 +19,11 @@ int main(void)
 	printf("1, 对战模式\n");
 	printf("2, 单机模式\n");
 	int mode=0;
-	//inputUntilTrue(mode, "请输入1或者2", [](decltype(mode) a) {return a == 1 || a == 2; });
-	mode = 2;
+	inputUntilTrue(mode, "请输入1或者2", [](decltype(mode) a) {return a == 1 || a == 2; });
+	//mode = 2;
 	SocketManager sock;
+	int fd = -1;
+
 	if(mode==1){
 		//TODO::扫描端口,空闲使用
 		//TODO::这里是否可以选择不用if-else 语句来实现
@@ -31,9 +33,9 @@ int main(void)
 		if(ipAddr!="1"){
 			cout<<"请输入对方端口";
 			inputUntilTrue(port, "输入判断失败,请重试|input error, try again", [](decltype(ipAddr) port) { int iport = atoi(port.c_str()); return iport > 0 && iport < 65535; });
-			auto fd=sock.connect(ipAddr, port);
+			fd=sock.connect(ipAddr, port);
 		}else{
-			auto fd=sock.bindAndListenSocket("127.0.0.1");
+			fd=sock.bindAndListenSocket("127.0.0.1");
 		}
 	}
 
@@ -43,6 +45,7 @@ int main(void)
 	//inputUntilTrue(matrixDim, "input error , please iput again\n", [](decltype(matrixDim) a) {return a <= MAX_DIM&& a >= MIN_DIM; });
 	matrixDim = 12;
 	MineGame *pMG=MineGame::getMineGame(matrixDim);
+	pMG->Com->addRWfd(fd, fd);
 	pMG->run();
     return 0;
 }

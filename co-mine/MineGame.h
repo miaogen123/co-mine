@@ -12,6 +12,8 @@
 class MineGame
 {
 public:
+	std::shared_ptr<Communicate> Com;
+
 	~MineGame();
 	static MineGame* getMineGame(int dim);
 	int scanKeyboard(); 
@@ -39,7 +41,6 @@ private:
 
 	MineGame(int dim);
 	Display* toScreen;
-	std::shared_ptr<Communicate> Com;
 
     int count=0;
 	//Œª÷√
