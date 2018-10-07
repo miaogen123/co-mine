@@ -1,6 +1,7 @@
 #pragma once
 //单例实现
 #include<memory>
+#include"globalConfig.h"
 
 #include"Communicate.h"
 #include"Display.h"
@@ -25,7 +26,6 @@ public:
 	bool judge(int x, int y);
 	void writeTofd(int fd);
 	void process();
-
 
 private:
 	//单例模式只调用一次

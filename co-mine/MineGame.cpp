@@ -1,4 +1,5 @@
 #include "MineGame.h"
+#include<iostream>
 #include<future>
 #include<thread>
 #include<termio.h>
@@ -37,6 +38,9 @@ void MineGame::writeTofd(int fd)
 {
 	while(true){
 		char state=(char)scanKeyboard();
+#ifdef DEBUG
+		std::cout << state << std::endl;
+#endif
 		write(fd, static_cast<void *>(&state), 1);
 	}
 }
@@ -44,7 +48,13 @@ void MineGame::writeTofd(int fd)
 void MineGame::process()
 {
     while(true){
+#ifdef DEBUG
+		std::cout << "hello" <<std::endl;
+#endif // DEBUG
 		auto command=Com->waitAndGetData(commandSize);
+#ifdef DEBUG
+		std::cout << "world" <<std::endl;
+#endif // DEBUG
 		char state = command[0];
 		printf("...i\n");
 		if(count!=1){
@@ -396,12 +406,19 @@ void MineGame::run()
 	int stdinToListenSource[2];
 	{	int tmpCountTry = 0;
 		while (pipe(stdinToListenSource) != 0) {
+
+#ifdef DEBUG
+			std::cout << "in pipe" << std::endl;
+#endif
 			tmpCountTry++;
 			if (tmpCountTry >= 5)
 				throw std::runtime_error("管道映射失败, 程序无法继续运行");
 			sleep(0.5);
 	}    }
 	this->Com->addfd(stdinToListenSource[0]);
+#ifdef DEBUG
+	std::cout << "added" << std::endl;
+#endif
 	//state=(char)scanKeyboard();
 	//write(stdinToListenSource[1], static_cast<void *>(&state), 1);
 
@@ -409,6 +426,10 @@ void MineGame::run()
 	//auto retFu = std::async(std::launch::async, writeTofd, stdinToListenSource[1]);
 	std::thread getChar(&MineGame::writeTofd,this, stdinToListenSource[1]);
 	getChar.detach();
-
+	std::thread processInput(&MineGame::process, this);
+	processInput.detach();
+	Com->process();
+#ifdef DEBUG
+	std::cout << "ending" << std::endl;
+#endif
 }
-

@@ -1,6 +1,7 @@
 #pragma once
 #include<string>
 #include<netinet/in.h>
+#include"globalConfig.h"
 #include <netinet/tcp.h> 
 #include<limits>
 #include<functional>
@@ -27,4 +28,3 @@ public:
 	int bindAndListenSocket(std::string ipaddr, std::string port="53286");
 	int getListenfd() const ;
 };
-

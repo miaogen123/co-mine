@@ -2,7 +2,7 @@ target=co-mine
 obj= co-mine.o  myutils.o MineGame.o  Display.o Communicate.o SocketManager.o
 
 $(target):  $(obj)
-		  $(CXX) -o $@ $^
+		  $(CXX) -o $@ $^ -lpthread
 myutils.o:myutils.h myutils.cpp
 		 $(CXX)    -c myutils.cpp
 co-mine.o:co-mine.cpp

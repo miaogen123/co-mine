@@ -19,7 +19,8 @@ int main(void)
 	printf("1, 对战模式\n");
 	printf("2, 单机模式\n");
 	int mode=0;
-	inputUntilTrue(mode, "请输入1或者2", [](decltype(mode) a) {return a == 1 || a == 2; });
+	//inputUntilTrue(mode, "请输入1或者2", [](decltype(mode) a) {return a == 1 || a == 2; });
+	mode = 2;
 	SocketManager sock;
 	if(mode==1){
 		//TODO::扫描端口,空闲使用
@@ -39,9 +40,9 @@ int main(void)
 	//game
 	int matrixDim = 9;
 	printf("please input the dimension of the matrix(9~16)\n");
-	inputUntilTrue(matrixDim, "input error , please iput again\n", [](decltype(matrixDim) a) {return a <= MAX_DIM&& a >= MIN_DIM; });
+	//inputUntilTrue(matrixDim, "input error , please iput again\n", [](decltype(matrixDim) a) {return a <= MAX_DIM&& a >= MIN_DIM; });
+	matrixDim = 12;
 	MineGame *pMG=MineGame::getMineGame(matrixDim);
 	pMG->run();
-
     return 0;
 }

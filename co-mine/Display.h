@@ -1,4 +1,5 @@
 #pragma once
+#include"globalConfig.h"
 #include<cstdio>
 #include<string>
 
@@ -32,4 +33,3 @@ public:
 	~Display();
 private:
 };
-

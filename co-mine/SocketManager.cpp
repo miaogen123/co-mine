@@ -114,8 +114,7 @@ int SocketManager::set_tcp_keepAlive( int start, int interval, int count)
     int keepAlive = 1;   
     if (socketfd < 0 || start < 0 || interval < 0 || count < 0) return -1;   //入口参数检查 ，编程的好习惯。
     //启用心跳机制，如果您想关闭，将keepAlive置零即可   
-    if(setsockopt(socketfd,SOL_SOCKET,SO_KEEPALIVE,(void*)&keepAlive,sizeof(keepAlive)) == -1)   
-    {   
+    if(setsockopt(socketfd,SOL_SOCKET,SO_KEEPALIVE,(void*)&keepAlive,sizeof(keepAlive)) == -1){   
         perror("setsockopt");   
         return -1;   
     }   

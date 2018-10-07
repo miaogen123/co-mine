@@ -1,4 +1,5 @@
 #pragma once
+#include"globalConfig.h"
 #include<fcntl.h>
 #include<atomic>
 #include<condition_variable>
@@ -8,6 +9,7 @@
 #include<array>
 #include<sys/epoll.h>
 #include<unistd.h> 
+
 class Communicate
 {
 public:
@@ -24,12 +26,12 @@ public:
 	~Communicate();
 private:
 	const int MAX_EVENT_NUMBER = 1024;
-	const unsigned int MAX_BUF = 1024;
+	const unsigned int MAX_BUF = 10;
 
 	std::condition_variable cv;
 	std::mutex mt;
 	//TODO::≤‚ ‘“ªœ¬
-	size_t start, end;
+	int start=0, end=0;
 	char *buf;
 	int setNonBlock(int fd);
 	struct  epoll_event *events;

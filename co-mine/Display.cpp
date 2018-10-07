@@ -56,6 +56,7 @@ void Display::showSth(std::string content){
 	fflush(stdout);
 }
 
+
 Display::~Display()
 {
 }

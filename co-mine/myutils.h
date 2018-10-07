@@ -2,6 +2,7 @@
 #include<string>
 #include<netinet/in.h>
 #include <netinet/tcp.h> 
+#include"globalConfig.h"
 #include<limits>
 #include<functional>
 #include<iostream>
@@ -27,4 +28,3 @@ void inputUntilTrue(T& tobeInput, std::string msg, F judgeFunc){
 		std::cout<<msg;
 	}
 }
-
