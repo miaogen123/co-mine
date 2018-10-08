@@ -1,4 +1,5 @@
 #include "MineGame.h"
+#include"myutils.h"
 #include<iostream>
 #include<future>
 #include<thread>
@@ -12,11 +13,9 @@
 
 
 MineGame::MineGame(int dim):matrixDim(dim){
-	toScreen=new Display();
 	Com=std::make_shared<Communicate>(2);
-	std::default_random_engine e;
-	std::uniform_int_distribution<int>  uniID(0, 65535);
-	userID =uniID(e);
+	userID = static_cast<unsigned char>(getRandomInt());
+
 }
 
 MineGame::~MineGame()
@@ -35,12 +34,18 @@ bool MineGame::judge(int x, int y) {
 
 void MineGame::writeTofd(int fd)
 {
+	//std::array<char, 2>buf;
+	char buf[2];
 	while(true){
 		char state=(char)scanKeyboard();
-#ifdef DEBUG
-		std::cout << state << std::endl;
-#endif
-		write(fd, static_cast<void *>(&state), 1);
+		buf[0] = state;
+		buf[1] = userID;
+
+#ifdef DEBUG_
+		std::cout << "\nget char" << buf[0] << "\t" << int(buf[1]) << endl;
+#endif // DEBUG_
+
+		write(fd, buf, 2);
 	}
 }
 
@@ -49,22 +54,19 @@ void MineGame::process()
 	std::string command("");
 	int ind = 0;
 	char state;
+	int count = 0;
     while(true){
-#ifdef DEBUG
-		std::cout << "hello" <<std::endl;
-#endif // DEBUG
 
+		count++;
+		command=Com->waitAndGetData(commandSize);
 		if(ind>=command.size()){
-			command=Com->waitAndGetData(commandSize);
 			ind = 0;
 		}
-		state = command[ind];
-		ind += 1;
-		
 
-#ifdef DEBUG
-		std::cout << "world" <<std::endl;
-#endif // DEBUG
+		if (command.size() < 2)
+			continue;
+		state = command[ind];
+		ind += 2;
 		//printf("...i\n");
 		//if(count!=1){
 		//	Sub_MoveCursor(row, col, 0);
@@ -423,9 +425,6 @@ void MineGame::run()
 	{	int tmpCountTry = 0;
 		while (pipe(stdinToListenSource) != 0) {
 
-#ifdef DEBUG
-			std::cout << "in pipe" << std::endl;
-#endif
 			tmpCountTry++;
 			if (tmpCountTry >= 5)
 				throw std::runtime_error("管道映射失败, 程序无法继续运行");

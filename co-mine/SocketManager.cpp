@@ -56,9 +56,7 @@ int SocketManager::bindAndListenSocket(std::string ipaddr, std::string port_argu
 	linger.l_onoff = 1;
 	linger.l_linger = 5;
 	setsockopt(socketfd, SOL_SOCKET, SO_LINGER, (char *) &linger, sizeof(linger));
-	//TODO::³¤Á¬½Ó
-	//setsockopt(socketfd, SOL_SOCKET, SO_LINGER, (char *) &linger, sizeof(linger));
-	//set_tcp_keepAlive(0, 5, 3);
+	set_tcp_keepAlive(3, 50, 3);
 
 	if(socketfd<0)
 		throw std::runtime_error("socket create failed\n");

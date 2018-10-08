@@ -34,7 +34,9 @@ int main(void)
 		inputUntilTrue(ipAddr, "输入判断失败,请重试|input error, try again", [](decltype(ipAddr) mode){return true;});
 		if(ipAddr!="1"){
 			cout<<"请输入对方端口";
-			inputUntilTrue(port, "输入判断失败,请重试|input error, try again", [](decltype(ipAddr) port) { int iport = atoi(port.c_str()); return iport > 0 && iport < 65535; });
+			//inputUntilTrue(port, "输入判断失败,请重试|input error, try again", [](decltype(ipAddr) port) { int iport = atoi(port.c_str()); return iport > 0 && iport < 65535; });
+			ipAddr = "127.0.0.1";
+			port ="53286";
 			fd=sock.connect(ipAddr, port);
 			char dim[3];
 			cout << "waiting the command from the room host" << endl;
@@ -61,7 +63,8 @@ int main(void)
 	}
 	else {
 		printf("please input the dimension of the matrix(9~16)\n");
-		inputUntilTrue(matrixDim, "input error , please iput again\n", [](decltype(matrixDim) a) {return a <= MAX_DIM&& a >= MIN_DIM; });
+		//inputUntilTrue(matrixDim, "input error , please iput again\n", [](decltype(matrixDim) a) {return a <= MAX_DIM&& a >= MIN_DIM; });
+		matrixDim = 12;
 	}
 
 	MineGame *pMG=MineGame::getMineGame(matrixDim);

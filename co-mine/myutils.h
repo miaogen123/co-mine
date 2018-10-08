@@ -1,12 +1,13 @@
 #pragma once
 #include<string>
-#include<netinet/in.h>
-#include <netinet/tcp.h> 
+#include<functional>
 #include"globalConfig.h"
 #include<limits>
-#include<functional>
 #include<iostream>
+#include<chrono>
+#include<random>
 
+int getRandomInt();
 
 //一个用函数而非模板作为参数的inputUntilTrue
 template<typename T>
@@ -28,3 +29,4 @@ void inputUntilTrue(T& tobeInput, std::string msg, F judgeFunc){
 		std::cout<<msg;
 	}
 }
+

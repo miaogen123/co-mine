@@ -1,6 +1,7 @@
 #pragma once
 //单例实现
 #include<memory>
+#include<iostream>
 #include"globalConfig.h"
 
 #include"Communicate.h"
@@ -33,22 +34,22 @@ public:
 	void process();
 
 private:
+
 	//单例模式只调用一次
 	const int matrixDim;
 	const int  MINE_VAL = 20;			//雷的数值
-	unsigned int userID;
+	unsigned char userID;
+
 	//一条指令两个字节：字符+userID
 	const size_t commandSize = 2;
 	int mine[MAX_DIM][MAX_DIM];
 	int flag[MAX_DIM][MAX_DIM];
 
 	MineGame(int dim);
-	Display* toScreen;
 
     int count=0;
 	//位置
     int row=1, col=1;
     char  state;
     int mineremain=0, true_mineremain=0;
-
 };

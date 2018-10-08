@@ -39,33 +39,32 @@ void Communicate::process()
 		for (auto i = 0; i < ret; i++) {
 			int fd = events[i].data.fd;
 			//数据的源FD与writeTo不相等，则是来自内部的数据，需要转发
-
-			
 			int Rcount = 0;
 			std::unique_lock<std::mutex>  lock_u(mt);
 			if (fd != writeTo && events[i].events&EPOLLIN) {
 					Rcount = read(fd,  innerBuf,MAX_BUF);
 					cv.wait(lock_u, [this, Rcount]() {
-					auto remain=MAX_BUF-static_cast<int>((this->end + MAX_BUF - this->start) % MAX_BUF) ;
-					//std::cout << remain<< std::endl;
-					return remain>Rcount;
-				});
+						auto remain=MAX_BUF-static_cast<int>((this->end + MAX_BUF - this->start) % MAX_BUF) ;
+						return remain>Rcount;
+					});
 				send(writeTo, innerBuf, Rcount, 0);
 			}
 			else if (fd == writeTo && events[i].events&EPOLLIN) {
 					Rcount = recv(fd,  innerBuf,MAX_BUF, 0);
-					cv.wait(lock_u, [this, Rcount]() {
-					auto remain=MAX_BUF-static_cast<int>((this->end + MAX_BUF - this->start) % MAX_BUF) ;
-					//std::cout << remain<< std::endl;
-					return remain>Rcount;
-				});
+						cv.wait(lock_u, [this, Rcount]() {
+						auto remain=MAX_BUF-static_cast<int>((this->end + MAX_BUF - this->start) % MAX_BUF) ;
+						//std::cout << remain<< std::endl;
+						return remain>Rcount;
+					});
+					std::cout <<"socket"<< innerBuf[0]<< "\t"<<(int)innerBuf[1]<<std::endl;
 			}
 			int count = 0;
 			while (count < Rcount) {
-				buf [(end + MAX_BUF) % MAX_BUF]= innerBuf[count];
+				buf [end]= innerBuf[count];
+				end = ( end + 1) % MAX_BUF;
 				count++;
 			}
-			end = (end + Rcount) % MAX_BUF;
+			//end = (end + Rcount) % MAX_BUF;
 			try{
 				lock_u.unlock();
 			}
@@ -99,8 +98,8 @@ std::string Communicate::waitAndGetData(size_t count)
 
 Communicate::~Communicate()
 {
-	delete[]events;
-	delete[]buf;
+	delete []events;
+	delete []buf;
 }
 
 int Communicate::setNonBlock(int fd){
