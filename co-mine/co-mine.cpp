@@ -4,6 +4,7 @@
 #include<iostream>
 #include<cstdio>
 #include"myutils.h"
+#include<stdexcept>
 #include"MineGame.h"
 #include"SocketManager.h"
 
@@ -24,6 +25,7 @@ int main(void)
 	SocketManager sock;
 	int fd = -1;
 
+	int matrixDim = -1;
 	if(mode==1){
 		//TODO::扫描端口,空闲使用
 		//TODO::这里是否可以选择不用if-else 语句来实现
@@ -34,16 +36,34 @@ int main(void)
 			cout<<"请输入对方端口";
 			inputUntilTrue(port, "输入判断失败,请重试|input error, try again", [](decltype(ipAddr) port) { int iport = atoi(port.c_str()); return iport > 0 && iport < 65535; });
 			fd=sock.connect(ipAddr, port);
+			char dim[3];
+			cout << "waiting the command from the room host" << endl;
+			int Rcount= recv(fd, dim, 2, 0);
+			if (Rcount < 0) {
+				throw std::runtime_error("can't get the matrix dim");
+				exit(-1);
+			}
+			try {
+				matrixDim = std::atoi(dim);
+			}
+			//TODO::修复一下这里的异常处理
+			catch (std::exception &e){
+				std::cout << e.what() << endl;
+				exit(-1);
+			}
 		}else{
 			fd=sock.bindAndListenSocket("127.0.0.1");
+			printf("please input the dimension of the matrix(9~16)\n");
+			inputUntilTrue(matrixDim, "input error , please iput again\n", [](decltype(matrixDim) a) {return a <= MAX_DIM&& a >= MIN_DIM; });
+			int dim = std::to_string(matrixDim).size();
+			send(fd, std::to_string(matrixDim).c_str(),dim , 0);
 		}
 	}
+	else {
+		printf("please input the dimension of the matrix(9~16)\n");
+		inputUntilTrue(matrixDim, "input error , please iput again\n", [](decltype(matrixDim) a) {return a <= MAX_DIM&& a >= MIN_DIM; });
+	}
 
-	//game
-	int matrixDim = 9;
-	printf("please input the dimension of the matrix(9~16)\n");
-	inputUntilTrue(matrixDim, "input error , please iput again\n", [](decltype(matrixDim) a) {return a <= MAX_DIM&& a >= MIN_DIM; });
-	//matrixDim = 12;
 	MineGame *pMG=MineGame::getMineGame(matrixDim);
 	pMG->Com->addRWfd(fd, fd);
 	pMG->run();

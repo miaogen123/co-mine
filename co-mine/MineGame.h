@@ -6,6 +6,9 @@
 #include"Communicate.h"
 #include"Display.h"
 
+using std::endl;
+using std::cout;
+
 #define  MAX_DIM 16           //定义扫雷的最大阶数
 #define MIN_DIM  9           //定义最小的扫雷阶数
 
