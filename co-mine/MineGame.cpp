@@ -389,6 +389,8 @@ void MineGame::DisplayCursor(int row, int col)
       Display::moveTo(row, col);
       flag[row-1][col-1]=1;
       printf("\033[40;32;1m%d \033[40;30;0m", mine[row-1][col-1]);
+	  Display::moveTo(matrixDim+2, 1);
+	  printf("\n");
     }
     else// diguibianlikongge MINE[row-1][col-1]==0
 	{

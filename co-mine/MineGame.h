@@ -1,5 +1,6 @@
 #pragma once
 //单例实现
+#include<map>
 #include<memory>
 #include<iostream>
 #include"globalConfig.h"
@@ -38,6 +39,9 @@ private:
 	//单例模式只调用一次
 	const int matrixDim;
 	const int  MINE_VAL = 20;			//雷的数值
+
+	//用户的ID和color的映射
+	std::map<unsigned char, FontColor>  userColor;
 	unsigned char userID;
 
 	//一条指令两个字节：字符+userID
