@@ -46,20 +46,32 @@ void MineGame::writeTofd(int fd)
 
 void MineGame::process()
 {
+	std::string command("");
+	int ind = 0;
+	char state;
     while(true){
 #ifdef DEBUG
 		std::cout << "hello" <<std::endl;
 #endif // DEBUG
-		auto command=Com->waitAndGetData(commandSize);
+
+		if(ind>=command.size()){
+			command=Com->waitAndGetData(commandSize);
+			ind = 0;
+		}
+		state = command[ind];
+		ind += 1;
+		
+
 #ifdef DEBUG
 		std::cout << "world" <<std::endl;
 #endif // DEBUG
-		char state = command[0];
-		printf("...i\n");
-		if(count!=1){
-			Sub_MoveCursor(row, col, 0);
-		}
-		count++;
+		//printf("...i\n");
+		//if(count!=1){
+		//	Sub_MoveCursor(row, col, 0);
+		//}
+		//count++;
+		Sub_MoveCursor(row, col, 1);
+		Sub_MoveCursor(row, col, 0);
 		if(state=='I'){
 			if(row==1){
 				row=matrixDim;
@@ -99,6 +111,7 @@ void MineGame::process()
 				col++;
 				Sub_MoveCursor(row, col, 1);
 			}
+
 		}
         else if(state=='A'){
           if(flag[row-1][col-1]!=1&&flag[row-1][col-1]!=2){
@@ -253,12 +266,16 @@ void MineGame::Sub_MoveCursor(int row ,int col, int flag)//flagµÄ×÷ÓÃÔÚÓÚ ÊÇ1Ê±Ï
 	Display::reset();
 	Display::moveTo(row, col);
 	Display::moveRight();
+
+	//fflush(stdout);
 	if(flag==1){
 		printf("\033[44;34;1m|\033[40;30;0m" );
 	}
 	else if(flag==0){
 		printf(" ");
 	}
+	Display::moveTo(matrixDim+2, 1);
+	printf("\n");
 }
 
 //À×±»Òý±¬ ÏÔÊ¾ËùÓÐµÄÀ× ²¢Êä³ö±¬Õ¨ÌØÐ§  ²ÎÊý£ºÎÞ ·µ»Ø£º¿Õ
@@ -400,7 +417,7 @@ void MineGame::run()
     true_mineremain=mineremain;
     Initialize();
     printf("mineremain=%d     \n", mineremain  );
-	count=0;
+	//count=0;
 	int err=0;
 	int stdinToListenSource[2];
 	{	int tmpCountTry = 0;

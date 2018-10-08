@@ -42,8 +42,8 @@ int main(void)
 	//game
 	int matrixDim = 9;
 	printf("please input the dimension of the matrix(9~16)\n");
-	//inputUntilTrue(matrixDim, "input error , please iput again\n", [](decltype(matrixDim) a) {return a <= MAX_DIM&& a >= MIN_DIM; });
-	matrixDim = 12;
+	inputUntilTrue(matrixDim, "input error , please iput again\n", [](decltype(matrixDim) a) {return a <= MAX_DIM&& a >= MIN_DIM; });
+	//matrixDim = 12;
 	MineGame *pMG=MineGame::getMineGame(matrixDim);
 	pMG->Com->addRWfd(fd, fd);
 	pMG->run();

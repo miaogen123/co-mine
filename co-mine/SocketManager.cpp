@@ -56,15 +56,18 @@ int SocketManager::bindAndListenSocket(std::string ipaddr, std::string port_argu
 	linger.l_onoff = 1;
 	linger.l_linger = 5;
 	setsockopt(socketfd, SOL_SOCKET, SO_LINGER, (char *) &linger, sizeof(linger));
+	//TODO::长连接
+	//setsockopt(socketfd, SOL_SOCKET, SO_LINGER, (char *) &linger, sizeof(linger));
+	//set_tcp_keepAlive(0, 5, 3);
 
 	if(socketfd<0)
-		throw std::runtime_error("socket 创建失败\n");
+		throw std::runtime_error("socket create failed\n");
 	int ret=bind(socketfd, (struct sockaddr*)&address, sizeof(address));
 	if(ret==-1)
-		throw std::runtime_error("socket 绑定失败\n");
+		throw std::runtime_error("socket bind failed\n");
 	ret=listen(socketfd, 5);
 	if(ret==-1)
-		throw std::runtime_error("socket 监听失败\n");
+		throw std::runtime_error("socket listen failed\n");
 	auto connfd=accept(socketfd, (struct sockaddr*)&address, (unsigned int*	)(&(address)));
 	//while(true){
 	//	send(connfd, "quuuuu", 7, MSG_NOSIGNAL);
@@ -115,25 +118,25 @@ int SocketManager::set_tcp_keepAlive( int start, int interval, int count)
     if (socketfd < 0 || start < 0 || interval < 0 || count < 0) return -1;   //入口参数检查 ，编程的好习惯。
     //启用心跳机制，如果您想关闭，将keepAlive置零即可   
     if(setsockopt(socketfd,SOL_SOCKET,SO_KEEPALIVE,(void*)&keepAlive,sizeof(keepAlive)) == -1){   
-        perror("setsockopt");   
+        perror("setsockopt start error ");   
         return -1;   
     }   
     //启用心跳机制开始到首次心跳侦测包发送之间的空闲时间   
     if(setsockopt(socketfd,SOL_TCP,TCP_KEEPIDLE,(void *)&start,sizeof(start)) == -1)   
     {   
-        perror("setsockopt");   
+        perror("setsockopt set first start interval error");   
         return -1;   
     }   
     //两次心跳侦测包之间的间隔时间   
     if(setsockopt(socketfd,SOL_TCP,TCP_KEEPINTVL,(void *)&interval,sizeof(interval)) == -1)   
     {   
-        perror("setsockopt");   
+        perror("setsockopt set interval error");   
         return -1;   
     }   
     //探测次数，即将几次探测失败判定为TCP断开   
     if(setsockopt(socketfd,SOL_TCP,TCP_KEEPCNT,(void *)&count,sizeof(count)) == -1)   
     {   
-        perror("setsockopt");   
+        perror("setsockopt set retry count error");   
         return -1;   
     }   
     return 0;   

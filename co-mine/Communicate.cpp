@@ -35,13 +35,11 @@ void Communicate::process()
 	char innerBuf[MAX_BUF];
 	while (true) {
 		int ret = epoll_wait(epollfd, events, MAX_EVENT_NUMBER, -1);
-#ifdef DEBUG
-		std::cout << "get one " << std::endl;
-#endif // DEBUG
 
 		for (auto i = 0; i < ret; i++) {
 			int fd = events[i].data.fd;
 			//数据的源FD与writeTo不相等，则是来自内部的数据，需要转发
+
 			
 			int Rcount = 0;
 			std::unique_lock<std::mutex>  lock_u(mt);
@@ -49,7 +47,7 @@ void Communicate::process()
 					Rcount = read(fd,  innerBuf,MAX_BUF);
 					cv.wait(lock_u, [this, Rcount]() {
 					auto remain=MAX_BUF-static_cast<int>((this->end + MAX_BUF - this->start) % MAX_BUF) ;
-					std::cout << remain<< std::endl;
+					//std::cout << remain<< std::endl;
 					return remain>Rcount;
 				});
 				send(writeTo, innerBuf, Rcount, 0);
@@ -58,13 +56,10 @@ void Communicate::process()
 					Rcount = recv(fd,  innerBuf,MAX_BUF, 0);
 					cv.wait(lock_u, [this, Rcount]() {
 					auto remain=MAX_BUF-static_cast<int>((this->end + MAX_BUF - this->start) % MAX_BUF) ;
-					std::cout << remain<< std::endl;
+					//std::cout << remain<< std::endl;
 					return remain>Rcount;
 				});
 			}
-#ifdef DEBUG
-		std::cout << "after waiting" << std::endl;
-#endif // DEBUG
 			int count = 0;
 			while (count < Rcount) {
 				buf [(end + MAX_BUF) % MAX_BUF]= innerBuf[count];
@@ -73,23 +68,12 @@ void Communicate::process()
 			end = (end + Rcount) % MAX_BUF;
 			try{
 				lock_u.unlock();
-#ifdef DEBUG
-		std::cout << "unlocking" << std::endl;
-#endif // DEBUG
 			}
 			catch (std::system_error &e) {
 				std::cout << e.what() << std::endl;
 			}
-#ifdef DEBUG
-		std::cout << "inner procesing " << std::endl;
-#endif // DEBUG
-
 			memset(innerBuf, 0, MAX_BUF);
-#ifdef DEBUG
-		std::cout << "end procesing " << std::endl;
-#endif // DEBUG
-		cv.notify_one();
-
+			cv.notify_one();
 		}
 	}
 }
