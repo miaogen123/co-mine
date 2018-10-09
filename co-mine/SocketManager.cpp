@@ -103,6 +103,8 @@ int SocketManager::createSocket(){
 	}else{
 		return -1;
 	}
+	int reuse = 1;
+	setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(reuse));
 	return 1;
 }
 

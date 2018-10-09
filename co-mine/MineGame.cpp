@@ -71,6 +71,7 @@ void MineGame::process()
 
 		state = command[ind];
 		auto netUserId=static_cast<unsigned char>(command[ind + 1]);
+		currentUserId = netUserId;
 		ind += 2;
 		cout << "userid " <<static_cast<unsigned char>(netUserId)<< endl;
 
@@ -152,8 +153,10 @@ void MineGame::process()
             printf("mineremain=%d     \n", mineremain  );
             if(mine[row-1][col-1]==MINE_VAL){
               true_mineremain--;
+			  users[netUserId]->mineNum++;
 			  if(true_mineremain==0){
-				  YouWin();
+				  //NOTE::这里为了留下扩展性，选择找出扫雷数最大的一个作为赢家
+				  judgeWinOrFail(users);
 			  }
             }
           }
@@ -161,6 +164,22 @@ void MineGame::process()
         Display::reset();
 		Display::moveDown(matrixDim+2);
     }
+}
+
+void MineGame::judgeWinOrFail(std::map<unsigned char, std::shared_ptr<UserStat>>& user)
+{
+	  int maxNum = 0;
+	  for (const auto & val : users) {
+			  maxNum = maxNum >( val.second)->mineNum ? maxNum : (val.second)->mineNum;
+		}
+	  for (const auto & val : users) {
+		  if ((val.second)->mineNum>maxNum) {
+			  YouWin();
+		  }
+		  else {
+			  BomMine();
+		  }
+		}
 }
 
 FontColor MineGame::assignColor(FontColor fc)
@@ -423,7 +442,12 @@ void MineGame::Set_Blank(int row, int col)
 void MineGame::DisplayCursor(int row, int col)
 {
     if(mine[row-1][col-1]==MINE_VAL){
-      BomMine();
+		if (currentUserId == userID) {
+			users.erase(userID);
+			BomMine();
+		}
+		else
+			judgeWinOrFail(users);
     }
     else if(mine[row-1][col-1]!=0){
       Display::moveTo(row, col);

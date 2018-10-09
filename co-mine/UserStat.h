@@ -13,10 +13,10 @@ public:
 	int& getRow();
 	int& getCol();
 	~UserStat();
+	int mineNum = 0;
 private:
 	unsigned char userID;
 	FontColor fontcolor;
 	int row=1, col = 1;
-	int mineNum = 0;
 
 };

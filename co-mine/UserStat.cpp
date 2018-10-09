@@ -41,6 +41,7 @@ int& UserStat::getCol()
 	return col;
 }
 
+
 UserStat::~UserStat()
 {
 }

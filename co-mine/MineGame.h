@@ -18,6 +18,7 @@ class MineGame
 {
 public:
 	std::shared_ptr<Communicate> Com;
+	unsigned char currentUserId;
 
 	~MineGame();
 	static MineGame* getMineGame(int dim);
@@ -33,7 +34,9 @@ public:
 	bool judge(int x, int y);
 	void writeTofd(int fd);
 	void process();
+	void judgeWinOrFail( std::map<unsigned char, std::shared_ptr<UserStat>> &user);
 	FontColor assignColor(FontColor fc=FontColor::BLACK);
+
 
 private:
 
