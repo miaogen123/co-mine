@@ -15,6 +15,8 @@
 MineGame::MineGame(int dim):matrixDim(dim){
 	Com=std::make_shared<Communicate>(2);
 	userID = static_cast<unsigned char>(getRandomInt());
+	userColor[userID] = FontColor::GREEN;
+	assignColor(FontColor::GREEN);
 
 }
 
@@ -66,7 +68,15 @@ void MineGame::process()
 		if (command.size() < 2)
 			continue;
 		state = command[ind];
+		auto netUserId=static_cast<unsigned char>(command[ind + 1]);
 		ind += 2;
+
+		if (userColor.find(netUserId) == userColor.end()) {
+			auto cursorColor= assignColor();
+			userColor[netUserId] = cursorColor;
+		}
+
+		//cout << "color value\t" << static_cast<unsigned short>(userColor[netUserId])  << endl;
 		//printf("...i\n");
 		//if(count!=1){
 		//	Sub_MoveCursor(row, col, 0);
@@ -147,6 +157,27 @@ void MineGame::process()
         Display::reset();
 		Display::moveDown(matrixDim+2);
     }
+}
+
+FontColor MineGame::assignColor(FontColor fc)
+{
+	//8个flag与FontColor的八个对应，其中黑色的因为不易区分不用, 己方默认使用绿色
+	static std::array<bool, 8> colorUsed; 
+	if (fc != FontColor::BLACK) {
+		if (!colorUsed[static_cast<unsigned short>(fc)-30]) {
+			colorUsed[static_cast<unsigned short>(fc) - 30] = true;
+			return fc;
+		}
+	}
+
+	for (auto i = 1; i < colorUsed.size(); i++) {
+		if (!colorUsed[i]) {
+			colorUsed[i] = true;
+			return static_cast<FontColor>(30 + i);
+		}
+	}
+	throw std::runtime_error("The num of users has reached the max limited\n");;
+
 }
 
 int MineGame::scanKeyboard()

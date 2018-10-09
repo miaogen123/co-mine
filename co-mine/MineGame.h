@@ -33,6 +33,7 @@ public:
 	bool judge(int x, int y);
 	void writeTofd(int fd);
 	void process();
+	FontColor assignColor(FontColor fc=FontColor::BLACK);
 
 private:
 
