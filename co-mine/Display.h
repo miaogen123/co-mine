@@ -3,6 +3,7 @@
 #include<cstdio>
 #include<string>
 
+
 //仅支持替换字体颜色
 enum class FontColor :unsigned short {
 	BLACK = 30,
@@ -27,9 +28,11 @@ public:
 	static void moveDown(unsigned int x=1);
 	static void moveLeft(unsigned int x=1);
 	static void moveRight(unsigned int x=1);
-	static void showSthAt(unsigned int x, unsigned int y,std::string content); 
-	static void showSthAt(unsigned int x, unsigned int y,std::string content, FontColor before, FontColor after); 
-	static void showSth(std::string content); 
+	//static void showSthAt(unsigned int x, unsigned int y,std::string content); 
+	static void showSthAt(unsigned int x, unsigned int y,std::string content, FontColor before=before, FontColor after=after); 
+	//static void showSth(std::string content); 
+	static void showSth(std::string content,  FontColor before=before, FontColor after=after);
 	~Display();
-private:
+	static FontColor before;
+	static FontColor after;
 };

@@ -1,5 +1,7 @@
 #include "Display.h"
 
+FontColor Display::before = FontColor::GREEN;
+FontColor Display::after= FontColor::BLACK;
 
 
 Display::Display()
@@ -38,11 +40,11 @@ void Display::moveRight(unsigned int x){
 	printf("\033[%dC", (x));
 }
 
-void Display::showSthAt(unsigned int x, unsigned int y, std::string content){
-	printf("\033[%d;%dH", x, 4*(y-1)+1);
-	printf("%s", content.c_str());
-	fflush(stdout);
-}
+//void Display::showSthAt(unsigned int x, unsigned int y, std::string content){
+//	printf("\033[%d;%dH", x, 4*(y-1)+1);
+//	printf("%s", content.c_str());
+//	fflush(stdout);
+//}
 
 void Display::showSthAt(unsigned int x, unsigned int y, std::string content, FontColor before, FontColor after){
 	printf("\033[%d;%dH", x, 4*(y-1)+1);
@@ -51,9 +53,13 @@ void Display::showSthAt(unsigned int x, unsigned int y, std::string content, Fon
 	fflush(stdout);
 }
 
-void Display::showSth(std::string content){
-	printf("%s", content.c_str());
-	fflush(stdout);
+//void Display::showSth(std::string content){
+//	printf("%s", content.c_str());
+//}
+
+void Display::showSth(std::string content, FontColor before, FontColor after)
+{
+	printf("\033[;%d;1m%s\033[;%d;0m",static_cast<unsigned short>(before), content.c_str(), static_cast<unsigned short>(after));
 }
 
 

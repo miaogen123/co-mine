@@ -15,9 +15,11 @@
 MineGame::MineGame(int dim):matrixDim(dim){
 	Com=std::make_shared<Communicate>(2);
 	userID = static_cast<unsigned char>(getRandomInt());
-	userColor[userID] = FontColor::GREEN;
+	self_user = std::make_shared<UserStat>(userID);
+	self_user->setFontColor(FontColor::GREEN);
+	users[userID] = self_user;
 	assignColor(FontColor::GREEN);
-
+	std::cout << "id\t" << userID << endl;;
 }
 
 MineGame::~MineGame()
@@ -58,7 +60,6 @@ void MineGame::process()
 	char state;
 	int count = 0;
     while(true){
-
 		count++;
 		command=Com->waitAndGetData(commandSize);
 		if(ind>=command.size()){
@@ -67,21 +68,24 @@ void MineGame::process()
 
 		if (command.size() < 2)
 			continue;
+
 		state = command[ind];
 		auto netUserId=static_cast<unsigned char>(command[ind + 1]);
 		ind += 2;
+		cout << "userid " <<static_cast<unsigned char>(netUserId)<< endl;
 
-		if (userColor.find(netUserId) == userColor.end()) {
+		if (users.find(netUserId) == users.end()) {
 			auto cursorColor= assignColor();
-			userColor[netUserId] = cursorColor;
+			auto netUser = std::make_shared<UserStat>(netUserId);
+			netUser->setFontColor(cursorColor);
+			users[netUserId] = netUser;
 		}
+		Display::before = users[netUserId]->getFontColor();
+		int &row = users[netUserId]->getRow();
+		int &col= users[netUserId]->getCol();
+		cout << row << "\t" << col << endl;
+		//cout << static_cast<int>(netUserId)<< "\tcolor value\t" << static_cast<unsigned short>(userColor[netUserId])  << endl;
 
-		//cout << "color value\t" << static_cast<unsigned short>(userColor[netUserId])  << endl;
-		//printf("...i\n");
-		//if(count!=1){
-		//	Sub_MoveCursor(row, col, 0);
-		//}
-		//count++;
 		Sub_MoveCursor(row, col, 1);
 		Sub_MoveCursor(row, col, 0);
 		if(state=='I'){
@@ -123,7 +127,6 @@ void MineGame::process()
 				col++;
 				Sub_MoveCursor(row, col, 1);
 			}
-
 		}
         else if(state=='A'){
           if(flag[row-1][col-1]!=1&&flag[row-1][col-1]!=2){
@@ -139,8 +142,9 @@ void MineGame::process()
         }
         else if(state=='B'){
           if(flag[row-1][col-1]!=1&&flag[row-1][col-1]!=2){
-            Display::moveTo(row,col);
-			printf("\033[40;31;1m@\033[40;30;0m");
+            //Display::moveTo(row,col);
+			  Display::showSthAt(row, col, "@");
+			//printf("\033[40;31;1m@\033[40;30;0m");
             flag[row-1][col-1]=2;
             mineremain--;
             Display::reset();
@@ -293,6 +297,7 @@ void MineGame::Initialize(void)
     }
     printf("\n");
 }
+
 //ÏÔÊ¾¹â±ê   ²ÎÊý£ºÆÁÄ»ÉÏµÄÐÐÁÐ  ÒÔ¼°±êÖ¾ 1»ò0 ·µ»ØÖµ£º¿Õ
 void MineGame::Sub_MoveCursor(int row ,int col, int flag)//flagµÄ×÷ÓÃÔÚÓÚ ÊÇ1Ê±ÏÔÊ¾¹â±ê ÊÇ0Ê±ÖØ»­ÆÁÄ»
 {
@@ -302,13 +307,15 @@ void MineGame::Sub_MoveCursor(int row ,int col, int flag)//flagµÄ×÷ÓÃÔÚÓÚ ÊÇ1Ê±Ï
 
 	//fflush(stdout);
 	if(flag==1){
-		printf("\033[44;34;1m|\033[40;30;0m" );
+		//printf("\033[44;34;1m|\033[40;30;0m" );
+		Display::showSth("B");
 	}
 	else if(flag==0){
 		printf(" ");
 	}
-	Display::moveTo(matrixDim+2, 1);
-	printf("\n");
+	Display::showSthAt(matrixDim + 2, 1, "\n");
+	//Display::moveTo(matrixDim+2, 1);
+	//printf("\n");
 }
 
 //À×±»Òý±¬ ÏÔÊ¾ËùÓÐµÄÀ× ²¢Êä³ö±¬Õ¨ÌØÐ§  ²ÎÊý£ºÎÞ ·µ»Ø£º¿Õ
@@ -320,8 +327,7 @@ void MineGame::BomMine()
       for(countone=0;countone<matrixDim;countone++){
         for(countsec=0;countsec<matrixDim;countsec++){
               if(mine[countone][countsec]==MINE_VAL){
-                  Display::moveTo(countone+1, countsec+1);
-                  printf("\033[;31;1mMN\033[;30;0m" );
+				  Display::showSthAt(countone + 1, countsec + 1, "MN");
               }
           }
       }
@@ -353,7 +359,10 @@ void MineGame::Set_Blank(int row, int col)
   if(mine[row][col]>0){
     Display::moveTo(row+1, col+1);
     flag[row][col]=1;
-    printf("\033[40;32;1m%d \033[40;30;0m" , mine[row][col]);
+    //printf("\033[40;32;1m%d \033[40;30;0m" , mine[row][col]);
+	Display::showSth(std::to_string(mine[row][col]) );
+	  Display::moveTo(matrixDim+2, 1);
+	  printf("\n");
     return ;
   }
   else if(mine[row][col]==-1){
@@ -419,11 +428,12 @@ void MineGame::DisplayCursor(int row, int col)
     else if(mine[row-1][col-1]!=0){
       Display::moveTo(row, col);
       flag[row-1][col-1]=1;
-      printf("\033[40;32;1m%d \033[40;30;0m", mine[row-1][col-1]);
+      //printf("\033[40;32;1m%d \033[40;30;0m", mine[row-1][col-1]);
+	  Display::showSth(std::to_string(mine[row][col]) );
 	  Display::moveTo(matrixDim+2, 1);
 	  printf("\n");
     }
-    else// diguibianlikongge MINE[row-1][col-1]==0
+    else
 	{
         Set_Blank(row-1,  col-1);
     }

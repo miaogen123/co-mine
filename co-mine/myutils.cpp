@@ -1,9 +1,16 @@
 #include "myutils.h"
+#include<chrono>
 
 int getRandomInt()
 {
-	//以当前时间作为种子，吐槽:真的长，
-	std::default_random_engine e(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()));
+	//errror
+	//std::default_random_engine e(std::chrono::high_resolution_clock::to_time_t(std::chrono::high_resolution_clock::now())+static_cast<long long>((&temp))&65535 );
+
+
+	std::default_random_engine e(clock());
 	std::uniform_int_distribution<unsigned int> uig;
 	return uig(e);
+
+	//srand(std::chrono::high_resolution_clock::to_time_t(std::chrono::high_resolution_clock::now()));
+	//return static_cast<int>(rand());
 }

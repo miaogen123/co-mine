@@ -56,7 +56,6 @@ void Communicate::process()
 						//std::cout << remain<< std::endl;
 						return remain>Rcount;
 					});
-					std::cout <<"socket"<< innerBuf[0]<< "\t"<<(int)innerBuf[1]<<std::endl;
 			}
 			int count = 0;
 			while (count < Rcount) {
@@ -71,6 +70,7 @@ void Communicate::process()
 			catch (std::system_error &e) {
 				std::cout << e.what() << std::endl;
 			}
+			//std::cout <<"socket\t"<< innerBuf[0]<< "\t"<<(int)innerBuf[1]<<std::endl;
 			memset(innerBuf, 0, MAX_BUF);
 			cv.notify_one();
 		}

@@ -4,7 +4,7 @@
 #include<memory>
 #include<iostream>
 #include"globalConfig.h"
-
+#include"UserStat.h"
 #include"Communicate.h"
 #include"Display.h"
 
@@ -41,8 +41,9 @@ private:
 	const int matrixDim;
 	const int  MINE_VAL = 20;			//雷的数值
 
-	//用户的ID和color的映射
-	std::map<unsigned char, FontColor>  userColor;
+	//用户的ID和user对象的映射
+	std::map<unsigned char, std::shared_ptr<UserStat>>  users;
+	std::shared_ptr<UserStat> self_user;
 	unsigned char userID;
 
 	//一条指令两个字节：字符+userID
@@ -54,7 +55,7 @@ private:
 
     int count=0;
 	//位置
-    int row=1, col=1;
+    //int row=1, col=1;
     char  state;
     int mineremain=0, true_mineremain=0;
 };
