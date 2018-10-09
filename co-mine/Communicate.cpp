@@ -1,9 +1,12 @@
 #include "Communicate.h"
+#include<signal.h>
 #include <sys/types.h>
 #include<iostream>	
 #include<stdexcept>
+#include<unistd.h>
 #include<string.h>
 #include <sys/socket.h>
+#include"myutils.h"
 
 
 Communicate::Communicate(int max_epoll):MAX_EVENT_NUMBER(max_epoll){
@@ -32,6 +35,7 @@ void Communicate::addRWfd(int readfd, int writefd, bool ET_R_enable)
 void Communicate::process()
 {
 	//lock_u.unlock();
+	signal(SIGPIPE, SIG_IGN);
 	char innerBuf[MAX_BUF];
 	while (true) {
 		int ret = epoll_wait(epollfd, events, MAX_EVENT_NUMBER, -1);
@@ -47,7 +51,7 @@ void Communicate::process()
 						auto remain=MAX_BUF-static_cast<int>((this->end + MAX_BUF - this->start) % MAX_BUF) ;
 						return remain>Rcount;
 					});
-				send(writeTo, innerBuf, Rcount, 0);
+						auto ret=send(writeTo, innerBuf, Rcount, 0);
 			}
 			else if (fd == writeTo && events[i].events&EPOLLIN) {
 					Rcount = recv(fd,  innerBuf,MAX_BUF, 0);
