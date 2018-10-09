@@ -72,7 +72,7 @@ void MineGame::process()
 		auto netUserId=static_cast<unsigned char>(command[ind + 1]);
 		currentUserId = netUserId;
 		ind += 2;
-		cout << "userid " <<static_cast<unsigned char>(netUserId)<< endl;
+		//cout << "userid " <<static_cast<unsigned char>(netUserId)<< endl;
 
 		if (users.find(netUserId) == users.end()) {
 			auto cursorColor= assignColor();
@@ -83,7 +83,7 @@ void MineGame::process()
 		Display::before = users[netUserId]->getFontColor();
 		int &row = users[netUserId]->getRow();
 		int &col= users[netUserId]->getCol();
-		cout << row << "\t" << col << endl;
+		//cout << row << "\t" << col << endl;
 		//cout << static_cast<int>(netUserId)<< "\tcolor value\t" << static_cast<unsigned short>(userColor[netUserId])  << endl;
 
 		Sub_MoveCursor(row, col, 1);
@@ -181,7 +181,7 @@ void MineGame::judgeWinOrFail(std::map<unsigned char, std::shared_ptr<UserStat>>
 			  maxNum = maxNum >( val.second)->mineNum ? maxNum : (val.second)->mineNum;
 		}
 	  for (const auto & val : users) {
-		  if ((val.second)->mineNum>maxNum) {
+		  if ((val.second)->mineNum>=maxNum) {
 			  YouWin();
 		  }
 		  else {
@@ -449,7 +449,7 @@ void MineGame::DisplayCursor(int row, int col)
       Display::moveTo(row, col);
       flag[row-1][col-1]=1;
       //printf("\033[40;32;1m%d \033[40;30;0m", mine[row-1][col-1]);
-	  Display::showSth(std::to_string(mine[row][col]) );
+	  Display::showSth(std::to_string(mine[row-1][col-1]) );
 	  Display::moveTo(matrixDim+2, 1);
 	  printf("\n");
     }
