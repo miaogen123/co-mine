@@ -2,6 +2,7 @@
 #include"myutils.h"
 #include<iostream>
 #include<future>
+#include"string.h"
 #include<thread>
 #include<termio.h>
 #include<sys/ioctl.h>
@@ -19,7 +20,6 @@ MineGame::MineGame(int dim):matrixDim(dim){
 	self_user->setFontColor(FontColor::GREEN);
 	users[userID] = self_user;
 	assignColor(FontColor::GREEN);
-	std::cout << "id\t" << userID << endl;;
 }
 
 MineGame::~MineGame()
@@ -60,7 +60,6 @@ void MineGame::process()
 	char state;
 	int count = 0;
     while(true){
-		count++;
 		command=Com->waitAndGetData(commandSize);
 		if(ind>=command.size()){
 			ind = 0;
@@ -130,6 +129,11 @@ void MineGame::process()
 			}
 		}
         else if(state=='A'){
+			if(count==0){
+				do {
+					InitializeMine();
+				} while (mine[row - 1][col - 1] >0);
+			}
           if(flag[row-1][col-1]!=1&&flag[row-1][col-1]!=2){
             DisplayCursor( row, col);
           }
@@ -140,8 +144,12 @@ void MineGame::process()
             Display::moveTo(matrixDim+2, 1);
             printf("mineremain=%d     \n", mineremain  );
           }
+			count++;
         }
         else if(state=='B'){
+			//NOTE::第一次点击需要点击A
+			if (count == 0)
+				continue;
           if(flag[row-1][col-1]!=1&&flag[row-1][col-1]!=2){
             //Display::moveTo(row,col);
 			  Display::showSthAt(row, col, "@");
@@ -225,29 +233,17 @@ int MineGame::scanKeyboard()
 void MineGame::InitializeMine()
 {
     //下面的变量分别用来记录 行阶 列阶 应有雷的数量 产生的随机数 实际的雷数目
-    int countone=0, countsec=0,amount=0,randnum=0, minenum=0;
+	memset(mine, 0, sizeof(mine));
+    int countone=0, countsec=0,amount=0, minenum=0;
     amount=(matrixDim-9)*5+10;
+	int r = 0, c = 0;
     while(minenum!=amount){          //直到生成了足够的雷后停止循环
-        for(countone=0;countone<matrixDim;countone++){
-            for(countsec=0;countsec<matrixDim;countsec++){
-                randnum=rand()%8+19;//MINE_VAL有雷
-                if(mine[countone][countsec]==MINE_VAL){
-                  continue;
-                }
-                else if(randnum==MINE_VAL ){
-                    if(minenum==amount){
-                        mine[countone][countsec]=randnum-1;
-                    }
-                    else{
-                        mine[countone][countsec]=randnum;
-                        minenum++;
-                    }
-                }
-                else{
-                  mine[countone][countsec] = randnum;
-                }
-              }
-          }
+		r=rand()%matrixDim;
+		c=rand()%matrixDim;
+		if(mine[r][c]!=MINE_VAL){
+			mine[r][c] = MINE_VAL;
+			minenum++;
+		}
     }
 	//进行循环遍历，查找出对应雷区四周的雷的数目
 	for (countone = 0; countone<matrixDim; countone++){
@@ -480,7 +476,6 @@ void MineGame::run()
     printf("please wait a monment.....\n");
     Display::clear();
     Display::reset();
-    InitializeMine();
     sleep(1);
     mineremain=(matrixDim-9)*5+10;
     true_mineremain=mineremain;

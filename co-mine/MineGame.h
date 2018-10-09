@@ -51,7 +51,7 @@ private:
 
 	//一条指令两个字节：字符+userID
 	const size_t commandSize = 2;
-	int mine[MAX_DIM][MAX_DIM];
+	int mine[MAX_DIM][MAX_DIM] = { 0 };
 	int flag[MAX_DIM][MAX_DIM];
 
 	MineGame(int dim);
