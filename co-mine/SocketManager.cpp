@@ -33,23 +33,25 @@ void  SocketManager::setIpAddrPort(std::string ipaddr, std::string port_argu){
 
 int SocketManager::connect(std::string ipaddr, std::string port_argu){
 	ipAddr=ipaddr, port=port_argu;
+	auto retnum=createSocket();
+	if (retnum == -1) {
+		std::cout << "socket create failed errno: " << errno << std::endl;
+	}
 	if(::connect(socketfd,(struct sockaddr*)&address, sizeof(address))<0){
 		std::cout<<"connect error"<<std::endl;
 		this->~SocketManager();
 		return -1;
 	}
-	//while(true){
-	//	char buf[10];
-	//	memset(buf, 0,10*sizeof(int));
-	//	recv(socketfd, buf, 10, MSG_DONTWAIT);
-	//	std::cout<<buf<<std::endl;
-	//	send(socketfd, "quuuuu", 7, MSG_NOSIGNAL);
-	//}
+	std::cout << "socketfd" << socketfd<< std::endl;
 	return socketfd;
 }
 
 int SocketManager::bindAndListenSocket(std::string ipaddr, std::string port_argu){
 	ipAddr=ipaddr, port=port_argu;
+	auto retnum=createSocket();
+	if(retnum==-1){
+		std::cout << "socket create failed errno: " << errno << std::endl;
+	}
 
 	//指定调用close后 5s回收资源
 	struct linger linger;
@@ -67,12 +69,7 @@ int SocketManager::bindAndListenSocket(std::string ipaddr, std::string port_argu
 	if(ret==-1)
 		throw std::runtime_error("socket listen failed\n");
 	auto connfd=accept(socketfd, (struct sockaddr*)&address, (unsigned int*	)(&(address)));
-	//while(true){
-	//	send(connfd, "quuuuu", 7, MSG_NOSIGNAL);
-	//	char buf[10];
-	//	recv(connfd, buf, 10, MSG_DONTWAIT);
-	//	std::cout<<buf<<std::endl;
-	//}
+	std::cout << "connfd " << connfd << std::endl;
 	return connfd;
 }
 int SocketManager::getListenfd() const {
@@ -81,10 +78,6 @@ int SocketManager::getListenfd() const {
 
 SocketManager::SocketManager(std::string ipAddr, std::string port):ipAddr(ipAddr), port(port){
 	socketfd=-1;
-	if(createSocket()==-1){
-		std::cout<<" this socket has been  used as connect socket "<<std::endl;
-		throw std::runtime_error("socket 创建失败,exit....");
-	}
 }
 
 SocketManager::~SocketManager(){

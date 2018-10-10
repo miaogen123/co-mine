@@ -73,6 +73,7 @@ void MineGame::process()
 		currentUserId = netUserId;
 		ind += 2;
 		//cout << "userid " <<static_cast<unsigned char>(netUserId)<< endl;
+		//cout << "command " << command<<endl;
 
 		if (users.find(netUserId) == users.end()) {
 			auto cursorColor= assignColor();

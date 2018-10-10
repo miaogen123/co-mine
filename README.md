@@ -9,3 +9,8 @@
 - 不同的用户使用不同的光标来表示
 - TODO::使用优雅的关闭socket的方式：5s以后关闭
 ***
+#### 效果图：
+##### 单机模式：
+![单机模式](https://github.com/miaogen123/co-mine/raw/master/单机模式.gif)
+##### 对战模式：
+![对战模式](https://github.com/miaogen123/co-mine/raw/master/对战模式.gif)

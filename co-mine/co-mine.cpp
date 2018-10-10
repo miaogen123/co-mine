@@ -22,9 +22,9 @@ int main(void)
 	int mode=0;
 	inputUntilTrue(mode, "请输入1或者2", [](decltype(mode) a) {return a == 1 || a == 2; });
 	//mode = 2;
-	SocketManager sock;
 	int fd = -1;
 
+	SocketManager sock;
 	int matrixDim = -1;
 	if(mode==1){
 		//TODO::扫描端口,空闲使用
@@ -34,15 +34,14 @@ int main(void)
 		inputUntilTrue(ipAddr, "输入判断失败,请重试|input error, try again", [](decltype(ipAddr) mode){return true;});
 		if(ipAddr!="1"){
 			cout<<"请输入对方端口";
-			//inputUntilTrue(port, "输入判断失败,请重试|input error, try again", [](decltype(ipAddr) port) { int iport = atoi(port.c_str()); return iport > 0 && iport < 65535; });
-			ipAddr = "127.0.0.1";
-			port ="53286";
+			inputUntilTrue(port, "输入判断失败,请重试|input error, try again", [](decltype(ipAddr) port) { int iport = atoi(port.c_str()); return iport > 0 && iport < 65535; });
+
 			fd=sock.connect(ipAddr, port);
 			char dim[3];
 			cout << "waiting the command from the room host" << endl;
 			int Rcount= recv(fd, dim, 2, 0);
 			if (Rcount < 0) {
-				throw std::runtime_error("can't get the matrix dim");
+				throw std::runtime_error("can't connect to the dest,can't get the matrix dim");
 				exit(-1);
 			}
 			try {
