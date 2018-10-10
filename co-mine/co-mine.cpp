@@ -13,7 +13,7 @@ using namespace std;
 int main(void)
 {
 	ios::sync_with_stdio(false);
-	printf("wel come to the game\n");
+	printf("welcome to the game\n");
 	printf("attention: this game use \"I K J L\" to move up or down or left or right\n");
 	printf("use A to implement mouse left click,  use B to implement mouse right click\n");
 	printf("首先请选择你要进行单机模式,还是对战模式\n");
