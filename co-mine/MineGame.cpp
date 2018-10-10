@@ -471,6 +471,27 @@ void MineGame::DisplayCursor(int row, int col)
 //显示youwin   参数返回值空
 void MineGame::YouWin(void)
 {
+      struct winsize ws;
+      ioctl(0, TIOCGWINSZ, &ws);
+      int countone=0, countsec=0;
+      for(countone=0;countone<matrixDim;countone++){
+        for(countsec=0;countsec<matrixDim;countsec++){
+              if(mine[countone][countsec]==MINE_VAL){
+				  Display::showSthAt(countone + 1, countsec + 1, "MN");
+              }
+          }
+      }
+      fflush(stdout);
+      sleep(3);
+      Display::reset();
+      for(countone=0;countone<matrixDim+10;countone++){
+          for(countsec=0;countsec<(int)ws.ws_col;++countsec){
+            printf(" ");
+          }
+          printf("\n");
+          usleep(40000);
+      }
+	  sleep(1);
   Display::clear();
   Display::reset();
   printf(" ***       ***      ***       @      *** *******           *****                 \n");
