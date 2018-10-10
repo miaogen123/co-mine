@@ -25,6 +25,7 @@ int main(void)
 	int fd = -1;
 
 	SocketManager sock;
+	time_t seedToGenerateMatrix;
 	int matrixDim = -1;
 	if(mode==1){
 		//TODO::扫描端口,空闲使用
@@ -37,27 +38,64 @@ int main(void)
 			inputUntilTrue(port, "输入判断失败,请重试|input error, try again", [](decltype(ipAddr) port) { int iport = atoi(port.c_str()); return iport > 0 && iport < 65535; });
 
 			fd=sock.connect(ipAddr, port);
-			char dim[3];
+			//NOTE:100bytes的大小应该够了
+			const int syncMessageMaxSize = 100;
+			char smessage[syncMessageMaxSize];
 			cout << "waiting the command from the room host" << endl;
-			int Rcount= recv(fd, dim, 2, 0);
+			int Rcount= recv(fd, smessage, syncMessageMaxSize, 0);
 			if (Rcount < 0) {
 				throw std::runtime_error("can't connect to the dest,can't get the matrix dim");
 				exit(-1);
 			}
+			auto dim=std::string("");
 			try {
-				matrixDim = std::atoi(dim);
+					//std::cout << "size" << smessage.size() << endl;
+				for (int i = 0; i < Rcount; i++) {
+					std::cout << "processing " << i << endl;
+					if (smessage[i] == '\0') {
+						dim = std::string(smessage, i + 1);
+						//dim = std::string(smessage, 0, i+1);
+						auto seed = std::string(smessage+i+1 , Rcount - i - 1);
+						seedToGenerateMatrix = std::atol(seed.c_str());
+						break;
+
+					}
+				}
+				matrixDim = std::atoi(dim.c_str());
 			}
 			//TODO::修复一下这里的异常处理
 			catch (std::exception &e){
 				std::cout << e.what() << endl;
 				exit(-1);
 			}
+#ifdef DEBUG_
+			for (auto i = 0; i < Rcount;i++) {
+				cout << smessage[i];
+			}
+			std::cout << endl;
+#endif // DEBUG_
 		}else{
 			fd=sock.bindAndListenSocket("127.0.0.1");
 			printf("please input the dimension of the matrix(9~16)\n");
 			inputUntilTrue(matrixDim, "input error , please iput again\n", [](decltype(matrixDim) a) {return a <= MAX_DIM&& a >= MIN_DIM; });
-			int dim = std::to_string(matrixDim).size();
-			send(fd, std::to_string(matrixDim).c_str(),dim , 0);
+
+			auto messageToSync1 = std::to_string(matrixDim);
+			//NOTE::这里种子分发，在cs结构下应该由服务器
+			seedToGenerateMatrix = time(0);
+			auto messageToSync2 = std::to_string(seedToGenerateMatrix);
+			auto messageToSync = messageToSync1 + std::string(1, '\0') + messageToSync2;
+			//TODO::这里最好处理一下，保证在能够拿到数据的情况下
+			//TODO::传递一个相同的种子
+			int dim = messageToSync.size();
+			send(fd, messageToSync.c_str(),dim , 0);
+
+#ifdef DEBUG_
+			for (auto val : messageToSync) {
+				cout << val;
+			}
+			std::cout << endl;
+#endif // DEBUG_
+
 		}
 	}
 	else {
@@ -65,9 +103,10 @@ int main(void)
 		inputUntilTrue(matrixDim, "input error , please iput again\n", [](decltype(matrixDim) a) {return a <= MAX_DIM&& a >= MIN_DIM; });
 		//matrixDim = 12;
 	}
-
+	std::cout << "the seed " << std::to_string(seedToGenerateMatrix) << std::endl;
 	MineGame *pMG=MineGame::getMineGame(matrixDim);
 	pMG->Com->addRWfd(fd, fd);
+	pMG->setSeedToGenerateMatrix(seedToGenerateMatrix); 
 	pMG->run();
     return 0;
 }

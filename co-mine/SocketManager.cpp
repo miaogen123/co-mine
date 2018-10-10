@@ -42,7 +42,6 @@ int SocketManager::connect(std::string ipaddr, std::string port_argu){
 		this->~SocketManager();
 		return -1;
 	}
-	std::cout << "socketfd" << socketfd<< std::endl;
 	return socketfd;
 }
 
@@ -69,7 +68,6 @@ int SocketManager::bindAndListenSocket(std::string ipaddr, std::string port_argu
 	if(ret==-1)
 		throw std::runtime_error("socket listen failed\n");
 	auto connfd=accept(socketfd, (struct sockaddr*)&address, (unsigned int*	)(&(address)));
-	std::cout << "connfd " << connfd << std::endl;
 	return connfd;
 }
 int SocketManager::getListenfd() const {

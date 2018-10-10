@@ -212,6 +212,11 @@ FontColor MineGame::assignColor(FontColor fc)
 
 }
 
+void MineGame::setSeedToGenerateMatrix(time_t seed)
+{
+	seedToGenerateMatrix = seed;
+}
+
 int MineGame::scanKeyboard()
 {
 	int in;
@@ -234,6 +239,10 @@ int MineGame::scanKeyboard()
 void MineGame::InitializeMine()
 {
     //下面的变量分别用来记录 行阶 列阶 应有雷的数量 产生的随机数 实际的雷数目
+    srand((unsigned long)seedToGenerateMatrix);
+	//每次使用过种子都要发生变化
+	seedToGenerateMatrix += 5;
+	//srand(time(0));
 	memset(mine, 0, sizeof(mine));
     int countone=0, countsec=0,amount=0, minenum=0;
     amount=(matrixDim-9)*5+10;
@@ -473,11 +482,10 @@ void MineGame::YouWin(void)
 //游戏入口函数   参数返回值：空
 void MineGame::run()
 {
-    srand((unsigned long)time(0));
     printf("please wait a monment.....\n");
     Display::clear();
     Display::reset();
-    sleep(1);
+    sleep(0.5);
     mineremain=(matrixDim-9)*5+10;
     true_mineremain=mineremain;
     Initialize();

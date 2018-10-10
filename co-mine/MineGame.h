@@ -36,6 +36,7 @@ public:
 	void process();
 	void judgeWinOrFail( std::map<unsigned char, std::shared_ptr<UserStat>> &user);
 	FontColor assignColor(FontColor fc=FontColor::BLACK);
+	void setSeedToGenerateMatrix(time_t seed);
 
 
 private:
@@ -51,6 +52,7 @@ private:
 
 	//一条指令两个字节：字符+userID
 	const size_t commandSize = 2;
+	time_t seedToGenerateMatrix;
 	int mine[MAX_DIM][MAX_DIM] = { 0 };
 	int flag[MAX_DIM][MAX_DIM];
 
