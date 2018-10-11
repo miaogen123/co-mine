@@ -24,4 +24,14 @@
 ##### 单机模式：
 ![单机模式](https://github.com/miaogen123/co-mine/raw/master/单机模式.gif)
 ##### 对战模式：
+
+右侧的虚拟机里面设置了随机移动(为了展现效果)，同时由于gif图压掉了一些帧，看起来要比实际的快
+
 ![对战模式](https://github.com/miaogen123/co-mine/raw/master/对战模式.gif)
+
+***
+
+#### 暂未解决的问题
+
+- 同步 : 也就是网络延迟的问题， 在上图对战模式的最后可以看到已经出现了不一致的位置，有了解决思路，还没有写，具体可以看这里 [co-mine_TODO](https://github.com/miaogen123/co-mine/projects/1)
+- 大量重复发包会卡死：同样见这里[co-mine_TODO](https://github.com/miaogen123/co-mine/projects/1)
