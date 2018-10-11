@@ -75,7 +75,7 @@ int main(void)
 			std::cout << endl;
 #endif // DEBUG_
 		}else{
-			fd=sock.bindAndListenSocket("127.0.0.1");
+			fd=sock.bindAndListenSocket("0.0.0.0");
 			printf("please input the dimension of the matrix(9~16)\n");
 			inputUntilTrue(matrixDim, "input error , please iput again\n", [](decltype(matrixDim) a) {return a <= MAX_DIM&& a >= MIN_DIM; });
 

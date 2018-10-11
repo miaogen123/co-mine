@@ -19,7 +19,7 @@ private:
 public:	
 	//自动使用connect
 	int set_tcp_keepAlive( int start, int interval, int count);
-	SocketManager(std::string ipAddr="127.0.0.1", std::string port="53286");
+	SocketManager(std::string ipAddr="0.0.0.0", std::string port="53286");
 	void setIpAddrPort(std::string ipaddr, std::string port="53286");
 	int connect(std::string ipAddr, std::string port="53286");
 	int getSocketOpt(int level, int optname, void *optval, socklen_t *optlen) const;
