@@ -5,7 +5,7 @@ jobs:
       - image: ubuntu:bionic
     steps:
       - checkout
-	  - run: cd ../co-mine
+      - run: cd ../co-mine
       - run:
           name: Greeting
           command: make 
