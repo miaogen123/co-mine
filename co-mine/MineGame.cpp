@@ -53,6 +53,7 @@ void MineGame::writeTofd(int fd)
 	}
 }
 
+//TODO::详细处理逻辑最好分离到主程序之外，因为处理程序的逻辑比较复杂，可能经常需要变
 void MineGame::process()
 {
 	std::string command("");

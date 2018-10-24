@@ -34,12 +34,10 @@ void Communicate::addRWfd(int readfd, int writefd, bool ET_R_enable)
 
 void Communicate::process()
 {
-	//lock_u.unlock();
 	signal(SIGPIPE, SIG_IGN);
 	char innerBuf[MAX_BUF];
 	while (true) {
 		int ret = epoll_wait(epollfd, events, MAX_EVENT_NUMBER, -1);
-
 		for (auto i = 0; i < ret; i++) {
 			int fd = events[i].data.fd;
 			//数据的源FD与writeTo不相等，则是来自内部的数据，需要转发
@@ -57,7 +55,6 @@ void Communicate::process()
 					Rcount = recv(fd,  innerBuf,MAX_BUF, 0);
 						cv.wait(lock_u, [this, Rcount]() {
 						auto remain=MAX_BUF-static_cast<int>((this->end + MAX_BUF - this->start) % MAX_BUF) ;
-						//std::cout << remain<< std::endl;
 						return remain>Rcount;
 					});
 			}
